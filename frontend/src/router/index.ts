@@ -22,6 +22,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "about" */ '../views/Profile.vue'),
     beforeEnter: routeGuard,
   },
+  {
+    path: '/external-api',
+    name: 'external-api',
+    component: () => import(/* webpackChunkName: "about" */ '../views/ExternalApi.vue'),
+  },
 ];
 
 const router = createRouter({
