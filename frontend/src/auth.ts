@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable consistent-return */
 import createAuth0Client, {
   Auth0Client, GetIdTokenClaimsOptions, GetTokenSilentlyOptions, GetTokenWithPopupOptions,
   LogoutOptions, RedirectLoginOptions,
 } from '@auth0/auth0-spa-js';
-import { computed, reactive } from 'vue';
+import { computed, reactive, watchEffect } from 'vue';
 
 let client: Auth0Client;
 const state = reactive({
@@ -75,7 +77,33 @@ const authPlugin = {
   logout,
 };
 
-export default async (options: any, callbackRedirect: any) => {
+export const routeGuard = (to: any, from: any, next: any) => {
+  const { isAuthenticated, loading } = authPlugin;
+
+  const verify = () => {
+    // If the user is authenticated, continue with the route
+    if (isAuthenticated.value) {
+      return next();
+    }
+
+    // Otherwise, log in
+    loginWithRedirect({ appState: { targetUrl: to.fullPath } });
+  };
+
+  // If loading has already finished, check our auth state using `fn()`
+  if (!loading.value) {
+    return verify();
+  }
+
+  // Watch for the loading property to change before we check isAuthenticated
+  watchEffect(() => {
+    if (loading.value === false) {
+      return verify();
+    }
+  });
+};
+
+export const setupAuth = async (options: any, callbackRedirect: any) => {
   client = await createAuth0Client({
     // eslint-disable-next-line @typescript-eslint/camelcase
     redirect_uri: window.location.origin,

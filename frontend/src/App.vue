@@ -6,6 +6,13 @@
     <router-link to="/about">
       About
     </router-link>
+    <router-link
+      v-if="$auth.isAuthenticated.value"
+      to="/profile"
+    >
+      Profile
+    </router-link>
+
     <p>{{ $auth.isAuthenticated.value }}</p>
     <!-- Check that the SDK client is not currently loading before accessing is methods -->
     <div v-if="!$auth.loading.value">
@@ -34,6 +41,7 @@ export default {
     // Log the user in
     login() {
       this.$auth.loginWithRedirect();
+      console.log(this.$auth.user.value);
     },
     // Log the user out
     logout() {

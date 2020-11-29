@@ -9,5 +9,6 @@
     "typescriptreact",
     "vue"
   ],
-  "eslint.workingDirectories": ["./frontend"]
+  "eslint.workingDirectories": ["./frontend"],
+  "files.eol": "\n",
 }
