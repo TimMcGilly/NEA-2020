@@ -77,7 +77,7 @@ const authPlugin = {
   logout,
 };
 
-export const routeGuard = (to: any, from: any, next: any) => {
+export const routeGuard = (to: any, from: any, next: Function) => {
   const { isAuthenticated, loading } = authPlugin;
 
   const verify = () => {

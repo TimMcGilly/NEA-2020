@@ -1,9 +1,11 @@
-import express from "express";
-import jwt from "express-jwt";
-import jwksRsa from "jwks-rsa";
+import express from 'express';
+import jwt from 'express-jwt';
+import jwksRsa from 'jwks-rsa';
 
+import dotenv from 'dotenv';
 import authConfig from '../auth_config.json';
 
+dotenv.config();
 // Create a new Express app
 const app = express();
 
@@ -14,21 +16,20 @@ const checkJwt = jwt({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: `https://${authConfig.domain}/.well-known/jwks.json`
+    jwksUri: `https://${authConfig.domain}/.well-known/jwks.json`,
   }),
 
   audience: authConfig.audience,
   issuer: `https://${authConfig.domain}/`,
-  algorithms: ["RS256"]
+  algorithms: ['RS256'],
 });
-
 
 app.use(checkJwt);
 
 // Define an endpoint that must be called with an access token
-app.get("/api/external", (req, res) => {
+app.get('/api/external', (req: any, res) => {
   res.send({
-    msg: "Your Access Token was successfully validated! "
+    msg: req.user,
   });
 });
 

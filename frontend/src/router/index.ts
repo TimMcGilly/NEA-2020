@@ -26,6 +26,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/external-api',
     name: 'external-api',
     component: () => import(/* webpackChunkName: "about" */ '../views/ExternalApi.vue'),
+    beforeEnter: routeGuard,
   },
 ];
 
