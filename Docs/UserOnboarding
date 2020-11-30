@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2020-11-30T20:56:23.588Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36" etag="oQAC7IdzO-f7sclmF8eC" version="13.10.4" type="github">
+<mxfile host="app.diagrams.net" modified="2020-11-30T22:13:10.340Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36" etag="Ybd1Sc9cgxYi0-WGsDq4" version="13.10.4" type="github">
   <diagram id="j8adqOw1xgNpazNJr5Y9" name="Page-1">
     <mxGraphModel dx="2249" dy="1874" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -137,7 +137,7 @@
         </mxCell>
         <mxCell id="HRC_NQ4-BpXZIpSJRwFW-42" value="Submit onboarding data" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="HRC_NQ4-BpXZIpSJRwFW-40" vertex="1" connectable="0">
           <mxGeometry x="0.3548" y="2" relative="1" as="geometry">
-            <mxPoint x="263" y="-12" as="offset" />
+            <mxPoint x="244" y="-14.98" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="HRC_NQ4-BpXZIpSJRwFW-46" value="Database User Table" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
