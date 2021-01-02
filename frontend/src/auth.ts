@@ -1,3 +1,11 @@
+/*
+The code here is from https://github.com/lstyles/vue3-auth0-sample with minor modifications.
+I am using this boilerplate code for setup of auth0 libary with vue3 as there is current proper support.
+It setup Auth0Client from auth0 spa libabry and the create reactive vue objects with it and several useful
+utilites functions for login.
+Also register as a new vue plugin.
+*/
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable consistent-return */
 import createAuth0Client, {
@@ -7,6 +15,7 @@ import createAuth0Client, {
 import { computed, reactive, watchEffect } from 'vue';
 
 let client: Auth0Client;
+// Reactive state which vue tracks
 const state = reactive({
   loading: true,
   isAuthenticated: false,
@@ -15,6 +24,7 @@ const state = reactive({
   error: null,
 });
 
+// Opens popup with login box
 async function loginWithPopup() {
   state.popupOpen = true;
 
@@ -30,6 +40,7 @@ async function loginWithPopup() {
   state.isAuthenticated = true;
 }
 
+// Called after login
 async function handleRedirectCallback() {
   state.loading = true;
 
@@ -64,6 +75,7 @@ function logout(o: LogoutOptions) {
   return client.logout(o);
 }
 
+// Exposed to vue so function can be called.
 const authPlugin = {
   isAuthenticated: computed(() => state.isAuthenticated),
   loading: computed(() => state.loading),
@@ -103,6 +115,7 @@ export const routeGuard = (to: any, from: any, next: Function) => {
   });
 };
 
+// Create vue plugin
 export const setupAuth = async (options: any, callbackRedirect: any) => {
   client = await createAuth0Client({
     // eslint-disable-next-line @typescript-eslint/camelcase
@@ -117,8 +130,9 @@ export const setupAuth = async (options: any, callbackRedirect: any) => {
       window.location.search.includes('code=')
       && window.location.search.includes('state=')
     ) {
-      // handle the redirect and retrieve tokens
-      const appState = await client.handleRedirectCallback();
+      // Handles the redirect and retrieve tokens.
+      // Need to get appState component out of RedirectLoginResult.
+      const { appState } = await client.handleRedirectCallback();
 
       // Notify subscribers that the redirect callback has happened, passing the appState
       // (useful for retrieving any pre-authentication state)

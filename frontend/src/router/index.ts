@@ -9,6 +9,11 @@ const routes: Array<RouteRecordRaw> = [
     component: Home,
   },
   {
+    path: '/callback',
+    name: 'Callback',
+    component: Callback,
+  },
+  {
     path: '/about',
     name: 'About',
     // route level code-splitting
