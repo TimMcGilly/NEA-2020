@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '../views/Home.vue';
-import { routeGuard } from '../auth';
+import Callback from '../views/Callback.vue';
+import { authRouteGuard, onboardingRouteGuard } from '../auth';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -19,19 +20,31 @@ const routes: Array<RouteRecordRaw> = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
+    component: () => import('../views/About.vue'),
   },
   {
     path: '/profile',
     name: 'Profile',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Profile.vue'),
-    beforeEnter: routeGuard,
+    component: () => import('../views/Profile.vue'),
+    beforeEnter: authRouteGuard,
   },
   {
     path: '/external-api',
     name: 'external-api',
-    component: () => import(/* webpackChunkName: "about" */ '../views/ExternalApi.vue'),
-    beforeEnter: routeGuard,
+    component: () => import('../views/ExternalApi.vue'),
+    beforeEnter: authRouteGuard,
+  },
+  {
+    path: '/onboard',
+    name: 'onboard',
+    component: () => import('../views/Onboard.vue'),
+    beforeEnter: authRouteGuard,
+  },
+  {
+    path: '/trips',
+    name: 'trips',
+    component: () => import('../views/Trips.vue'),
+    beforeEnter: authRouteGuard,
   },
 ];
 
@@ -39,5 +52,7 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
 });
+
+router.beforeEach(onboardingRouteGuard);
 
 export default router;

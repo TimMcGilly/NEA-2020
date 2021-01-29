@@ -3,15 +3,13 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 
+import './assets/css/tailwind.css';
+
 // Import the plugin here
 import { setupAuth } from './auth';
 import authConfig from '../auth_config.json';
 
-createApp(App).use(store).use(router);
-const app = createApp(App);
-
-app.use(store);
-app.use(router);
+const app = createApp(App).use(store).use(router);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function callbackRedirect(appState: any) {

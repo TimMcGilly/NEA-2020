@@ -14,6 +14,8 @@ import createAuth0Client, {
 } from '@auth0/auth0-spa-js';
 import { computed, reactive, watchEffect } from 'vue';
 
+import authConfig from '../auth_config.json';
+
 let client: Auth0Client;
 // Reactive state which vue tracks
 const state = reactive({
@@ -89,7 +91,7 @@ const authPlugin = {
   logout,
 };
 
-export const routeGuard = (to: any, from: any, next: Function) => {
+export const authRouteGuard = (to: any, from: any, next: Function) => {
   const { isAuthenticated, loading } = authPlugin;
 
   const verify = () => {
@@ -115,8 +117,40 @@ export const routeGuard = (to: any, from: any, next: Function) => {
   });
 };
 
+export const onboardingRouteGuard = (to: any, from: any, next: Function) => {
+  const { isAuthenticated, user, loading } = authPlugin;
+
+  const verify = () => {
+    // If the user is authenticated and not onboarded redirect to onboarding. Ensure no infinite loops.
+    if (to.path !== '/onboard'
+      && isAuthenticated.value
+      && (user.value as { [key: string]: any })[`${authConfig.audience}_onboarded`] === false) {
+      return next('/onboard');
+    }
+    if (to.path === '/onboard'
+      && isAuthenticated.value
+      && (user.value as { [key: string]: any })[`${authConfig.audience}_onboarded`] === true) {
+      return next('/trips');
+    }
+
+    return next();
+  };
+
+  // If loading has already finished, check our auth state using `fn()`
+  if (!loading.value) {
+    return verify();
+  }
+
+  // Watch for the loading property to change before we check isAuthenticated
+  watchEffect(() => {
+    if (loading.value === false) {
+      return verify();
+    }
+  });
+};
+
 // Create vue plugin
-export const setupAuth = async (options: any, callbackRedirect: any) => {
+export const setupAuth = async (options: any, callbackRedirect: Function) => {
   client = await createAuth0Client({
     // eslint-disable-next-line @typescript-eslint/camelcase
     redirect_uri: window.location.origin,
