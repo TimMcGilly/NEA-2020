@@ -3,8 +3,13 @@
 </template>
 
 <script>
-export default {
+import store from '../store';
 
+export default {
+  setup() {
+    store.dispatch.TripModule.fetchTripsAsync();
+    console.log(store.state.TripModule.trips);
+  },
 };
 </script>
 

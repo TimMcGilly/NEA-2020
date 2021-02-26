@@ -9,7 +9,7 @@ import './assets/css/tailwind.css';
 import { setupAuth } from './auth';
 import authConfig from '../auth_config.json';
 
-const app = createApp(App).use(store).use(router);
+const app = createApp(App).use(store.original).use(router);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function callbackRedirect(appState: any) {
