@@ -60,6 +60,7 @@
 
 <script>
 import axios from 'axios';
+import { Date13YearAgo, DateToYMDString } from '../../../shared/Utils/Date';
 
 export default {
   Name: 'onboard',
@@ -71,12 +72,7 @@ export default {
     };
   },
   computed: {
-    maxDOB: () => {
-      const date = new Date();
-      date.setDate(date.getDate() + 1);
-      date.setFullYear(date.getFullYear() - 13);
-      return date.toISOString().split('T')[0];
-    },
+    maxDOB: () => DateToYMDString(Date13YearAgo()),
   },
   methods: {
     async submitForm() {

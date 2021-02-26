@@ -25,9 +25,7 @@ const TripModule = defineModule({
   },
   actions: {
     async newTripAsync(context, trip: Trip) {
-      const {
-        commit, rootGetters,
-      } = TripModuleActionContext(context);
+      const { commit, rootGetters } = TripModuleActionContext(context);
       const { token } = rootGetters;
 
       try {

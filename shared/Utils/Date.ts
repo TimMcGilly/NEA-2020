@@ -5,4 +5,10 @@ export function Date13YearAgo() : Date {
   return date;
 }
 
+export function AddDaysToDate(date: Date, days: number): Date{
+  let result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+
 export function DateToYMDString(date : Date): string { return date.toISOString().split('T')[0]; }

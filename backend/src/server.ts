@@ -8,7 +8,7 @@ import mysql from 'mysql2';
 
 import bodyParser from 'body-parser';
 
-import { Date13YearAgo, DateToYMDString } from './Utils/Date';
+import { Date13YearAgo, DateToYMDString, AddDaysToDate } from '../../shared/Utils/Date';
 
 import authConfig from '../auth_config.json';
 
@@ -65,7 +65,7 @@ app.get('/api/external', (req, res) => {
 
 app.post('/api/onboard',
   body('name', 'Empty name').trim().isLength({ min: 1 }).escape(),
-  body('dob', 'Invalid age or under 13').isISO8601().toDate().isBefore(DateToYMDString(Date13YearAgo())),
+  body('dob', 'Invalid age or under 13').isISO8601().toDate().isBefore(DateToYMDString(AddDaysToDate(Date13YearAgo(), 1))),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

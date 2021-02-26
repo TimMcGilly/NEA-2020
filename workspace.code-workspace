@@ -1,0 +1,33 @@
+{
+	"folders": [
+		{
+			"name": ".git",
+			"path": ".git"
+		},
+		{
+			"name": "frontend",
+			"path": "frontend"
+		},
+		{
+			"name": "backend",
+			"path": "backend"
+		},
+		{
+			"name": "Docs",
+			"path": "Docs"
+		},
+		{
+			"name": "out",
+			"path": "out"
+		},
+		{
+			"name": "shared",
+			"path": "shared"
+		},
+		{
+			"name": ".vscode",
+			"path": ".vscode"
+		}
+	],
+	"settings": {}
+}

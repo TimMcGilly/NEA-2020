@@ -39,6 +39,11 @@
 import { createDirectStore } from 'direct-vuex';
 import TripModule from './modules/TripModule';
 
+export interface RootState {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  vue: any;
+}
+
 const {
   store,
   rootActionContext,
@@ -46,10 +51,20 @@ const {
   rootGetterContext,
   moduleGetterContext,
 } = createDirectStore({
+  state: {
+    vue: null,
+  } as RootState,
   getters: {
-    token() {
-      // eslint-disable-next-line no-underscore-dangle
-      return (this._vm as any).$auth.getTokenSilently();
+    token(...args): string {
+      const state = args[0];
+      console.log(state.vue);
+      return state.vue.$auth.getTokenSilently();
+    },
+  },
+  mutations: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setVueInstance(state, vue: any) {
+      state.vue = vue;
     },
   },
   modules: {
