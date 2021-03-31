@@ -3,7 +3,7 @@
 
 import axios from 'axios';
 import { defineModule } from 'direct-vuex';
-import { Trip } from '../../../../shared';
+import { Trip, PartialTrip } from '../../../../shared';
 
 import { moduleActionContext, moduleGetterContext } from '../index';
 
@@ -24,19 +24,19 @@ const TripModule = defineModule({
     },
   },
   actions: {
-    async newTripAsync(context, trip: Trip) {
+    async newTripAsync(context, partialTrip: PartialTrip) {
       const { commit, rootGetters } = TripModuleActionContext(context);
       const { token } = rootGetters;
 
       try {
-        await axios.post('/api/trips', {
-          trip,
+        const response = await axios.post('/api/trips', {
+          partialTrip,
         }, {
           headers: {
             Authorization: `Bearer ${token}`, // send the access token through the 'Authorization' header
           },
         });
-        commit.addTrip(trip);
+        commit.addTrip(response.data.trip);
       } catch (error) {
         console.error(error);
       }

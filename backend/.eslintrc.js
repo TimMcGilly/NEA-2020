@@ -6,8 +6,9 @@ module.exports = {
     modules: "true",
   },
   rules:{
-    'max-len': 'off'
-
+    'max-len': 'off',
+    'no-console': 'off',
+    'import/prefer-default-export': 'off',
   },
   plugins: [
     '@typescript-eslint',

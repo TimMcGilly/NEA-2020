@@ -4,7 +4,6 @@ import jwksRsa from 'jwks-rsa';
 
 import dotenv from 'dotenv';
 import { body, validationResult } from 'express-validator';
-import mysql from 'mysql2';
 
 import bodyParser from 'body-parser';
 
@@ -12,16 +11,13 @@ import { Date13YearAgo, DateToYMDString, AddDaysToDate } from '../../shared/Util
 
 import authConfig from '../auth_config.json';
 
-import * as AuthManager from './AuthManager';
+import * as AuthManager from './authManager';
+
+import { initDb, getDb } from './db';
+
+initDb();
 
 dotenv.config();
-
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
 
 // Create a new Express app
 const app = express();
@@ -80,7 +76,7 @@ app.post('/api/onboard',
     };
 
     try {
-      pool.query('INSERT INTO user SET ?', values);
+      await getDb().execute('INSERT INTO user SET ?', values);
       AuthManager.updateAppMetadata(req.user.sub, { onboarded: true });
       return res.sendStatus(201);
     } catch (e) {
@@ -88,5 +84,6 @@ app.post('/api/onboard',
       return res.sendStatus(500);
     }
   });
+
 // Start the app
 app.listen(3001, () => console.log('API listening on 3001'));

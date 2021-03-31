@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS `nea_backend_db`.`trip` (
     `name` TINYTEXT NOT NULL,
     `start_date` DATE NOT NULL,
     `end_date` DATE NOT NULL,
+    `text_loc` TEXT NOT NULL,
     `location` POINT SRID 4326 NOT NULL,
     SPATIAL INDEX(`location`),
     `user_id` INT NOT NULL,
