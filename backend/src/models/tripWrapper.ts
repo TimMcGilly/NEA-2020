@@ -33,14 +33,41 @@ export async function CreateTrip(user_id: number, partialTrip: PartialTrip): Pro
 
     return newTrip;
   } catch (e) {
-    if (conn) await conn.rollback();
+    if (conn) { await conn.rollback(); }
 
     console.log(e);
     throw e;
   } finally {
-    if (conn) await conn.release();
+    if (conn) { conn.release(); }
   }
 }
 
-export function FindAll(user_id : number): Trip[] {
+export async function FindAllTrips(user_id : number): Promise<Trip[]> {
+  let conn = null;
+
+  try {
+    conn = await getDb().getConnection();
+
+    await conn.beginTransaction();
+
+    // Get trip rows
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT * FROM trips WHERE user_id = ?', user_id);
+
+    // Turn rows into array of trips
+    const newTrips: Trip[] = [];
+    rows.forEach((r) => {
+      newTrips.push(new Trip(r as any));
+    });
+
+    await conn.commit();
+
+    return newTrips;
+  } catch (e) {
+    if (conn) { await conn.rollback(); }
+
+    console.log(e);
+    throw e;
+  } finally {
+    if (conn) { conn.release(); }
+  }
 }

@@ -5,8 +5,7 @@ import jwksRsa from 'jwks-rsa';
 import dotenv from 'dotenv';
 import { body, validationResult } from 'express-validator';
 
-import bodyParser from 'body-parser';
-
+import { CreateTripController, FindAllTripsController } from 'controllers/tripController';
 import { Date13YearAgo, DateToYMDString, AddDaysToDate } from '../../shared/Utils/Date';
 
 import authConfig from '../auth_config.json';
@@ -22,8 +21,8 @@ dotenv.config();
 // Create a new Express app
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Define middleware that validates incoming bearer tokens
 // using JWKS from dev-eh5-3nx1.eu.auth0.com
@@ -84,6 +83,10 @@ app.post('/api/onboard',
       return res.sendStatus(500);
     }
   });
+
+/// Trip Route ///
+app.post('/api/trip', ...CreateTripController);
+app.get('/api/trip', ...FindAllTripsController);
 
 // Start the app
 app.listen(3001, () => console.log('API listening on 3001'));
