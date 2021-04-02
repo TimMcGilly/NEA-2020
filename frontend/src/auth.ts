@@ -38,7 +38,7 @@ async function loginWithPopup() {
     state.popupOpen = false;
   }
 
-  state.user = await client.getUser();
+  state.user = (await client.getUser()) ?? {};
   state.isAuthenticated = true;
 }
 
@@ -48,7 +48,7 @@ async function handleRedirectCallback() {
 
   try {
     await client.handleRedirectCallback();
-    state.user = await client.getUser();
+    state.user = (await client.getUser()) ?? {};
     state.isAuthenticated = true;
   } catch (e) {
     state.error = e;
@@ -177,7 +177,7 @@ export const setupAuth = async (options: any, callbackRedirect: Function) => {
   } finally {
     // Initialize our internal authentication state
     state.isAuthenticated = await client.isAuthenticated();
-    state.user = await client.getUser();
+    state.user = (await client.getUser()) ?? {};
     state.loading = false;
   }
 
