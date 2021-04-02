@@ -6,4 +6,7 @@
     .form-simple{
         @apply rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent
     }
+    .form-simple>label{
+        @apply block text-gray-700
+    }
 }

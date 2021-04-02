@@ -46,6 +46,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/Trips.vue'),
     beforeEnter: authRouteGuard,
   },
+  {
+    path: '/trips/new',
+    component: () => import('../views/NewTrip.vue'),
+    beforeEnter: authRouteGuard,
+  },
+
 ];
 
 const router = createRouter({

@@ -6,7 +6,9 @@ which sets up basic callbacks for auth0. Boiler plate code -->
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   name: 'Callback',
   created() {
     if (this.$route.query.error) {
@@ -16,5 +18,5 @@ export default {
       });
     }
   },
-};
+});
 </script>

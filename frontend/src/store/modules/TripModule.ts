@@ -5,7 +5,7 @@ import axios from 'axios';
 import { defineModule } from 'direct-vuex';
 import { Trip, PartialTrip } from '../../../../shared';
 
-import { moduleActionContext, moduleGetterContext } from '../index';
+import { moduleActionContext } from '../index';
 
 export interface TripModuleState {
      trips: Trip[];
@@ -29,11 +29,11 @@ const TripModule = defineModule({
       const { token } = rootGetters;
 
       try {
-        const response = await axios.post('/api/trips', {
+        const response = await axios.post('/api/trip', {
           partialTrip,
         }, {
           headers: {
-            Authorization: `Bearer ${token}`, // send the access token through the 'Authorization' header
+            Authorization: `Bearer ${await token}`, // send the access token through the 'Authorization' header
           },
         });
         commit.addTrip(response.data.trip);
@@ -42,17 +42,21 @@ const TripModule = defineModule({
       }
     },
     async fetchTripsAsync(context) {
-      const { rootGetters } = TripModuleActionContext(context);
+      const { commit, rootGetters } = TripModuleActionContext(context);
 
       const { token } = rootGetters;
+
       // Use Axios to make a call to the /api/trips
       try {
-        const trips: Trip[] = await axios.get('/api/trips', {
+        const response = await axios.get('/api/trip', {
           headers: {
-            Authorization: `Bearer ${token}`, // send the access token through the 'Authorization' header
+            Authorization: `Bearer ${await token}`, // send the access token through the 'Authorization' header
           },
         });
-        trips.forEach((trip) => context.commit('addTrip', trip));
+
+        // eslint-disable-next-line prefer-destructuring
+        const trips: Trip[] = response.data.trips;
+        trips.forEach((trip) => commit.addTrip(trip));
       } catch (error) {
         console.error(error);
       }
@@ -61,5 +65,6 @@ const TripModule = defineModule({
 });
 
 export default TripModule;
-const TripModuleGetterContext = (args: [any, any, any, any]) => moduleGetterContext(args, TripModule);
+// const TripModuleGetterContext = (args: [any, any, any, any]) => moduleGetterContext(args, TripModule);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const TripModuleActionContext = (context: any) => moduleActionContext(context, TripModule);

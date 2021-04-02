@@ -5,7 +5,7 @@ import jwksRsa from 'jwks-rsa';
 import dotenv from 'dotenv';
 import { body, validationResult } from 'express-validator';
 
-import { CreateTripController, FindAllTripsController } from 'controllers/tripController';
+import { CreateTripController, FindAllTripsController } from './controllers/tripController';
 import { Date13YearAgo, DateToYMDString, AddDaysToDate } from '../../shared/Utils/Date';
 
 import authConfig from '../auth_config.json';
@@ -85,8 +85,8 @@ app.post('/api/onboard',
   });
 
 /// Trip Route ///
-app.post('/api/trip', ...CreateTripController);
 app.get('/api/trip', ...FindAllTripsController);
+app.post('/api/trip', ...CreateTripController);
 
 // Start the app
 app.listen(3001, () => console.log('API listening on 3001'));

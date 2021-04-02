@@ -57,7 +57,6 @@ const {
   getters: {
     token(...args): string {
       const state = args[0];
-      console.log(state.vue);
       return state.vue.$auth.getTokenSilently();
     },
   },

@@ -18,13 +18,13 @@ export async function CreateTrip(user_id: number, partialTrip: PartialTrip): Pro
 
     await conn.beginTransaction();
 
-    await conn.execute(`INSERT INTO trips 
+    await conn.execute(`INSERT INTO trip 
     (uuid, name, start_date, end_date, text_loc, location, user_id) 
     VALUES(UUID_TO_BIN(UUID()),?,?,?,?,ST_GeomFromText('POINT(? ?)', 4326), ?)`,
     [name, start_date, end_date, text_loc, loc_lat, loc_long, user_id]);
 
     // Need to get uuid for trip object
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT * FROM trips WHERE id = LAST_INSERT_ID()');
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT * FROM trip WHERE id = LAST_INSERT_ID()');
 
     // Expands partial trip plus uuid to make full trip
     const newTrip = new Trip({ uuid: rows[0].uuid, ...partialTrip });
@@ -44,20 +44,21 @@ export async function CreateTrip(user_id: number, partialTrip: PartialTrip): Pro
 
 export async function FindAllTrips(user_id : number): Promise<Trip[]> {
   let conn = null;
-
   try {
     conn = await getDb().getConnection();
 
     await conn.beginTransaction();
 
     // Get trip rows
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT * FROM trips WHERE user_id = ?', user_id);
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT * FROM trip WHERE user_id = ?', [user_id]);
 
     // Turn rows into array of trips
-    const newTrips: Trip[] = [];
+    let newTrips: Trip[] = [];
     rows.forEach((r) => {
       newTrips.push(new Trip(r as any));
     });
+
+    if (newTrips.length === 0) { newTrips = []; }
 
     await conn.commit();
 

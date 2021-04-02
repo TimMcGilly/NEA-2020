@@ -41,9 +41,9 @@
         id="bio"
         v-model="bio"
         class="block form-simple resize-none"
-        rows="4"
-        cols="50"
-        maxlength="400"
+        :rows="4"
+        :cols="50"
+        :maxlength="400"
       />
     </div>
     <div class="px-4">
@@ -58,12 +58,13 @@
   </form>
 </template>
 
-<script>
+<script lang="ts">
 import axios from 'axios';
+import { defineComponent } from 'vue';
 import { Date13YearAgo, DateToYMDString } from '../../../shared/Utils/Date';
 
-export default {
-  Name: 'onboard',
+export default defineComponent({
+  name: 'Onboard',
   data() {
     return {
       name: '',
@@ -96,7 +97,7 @@ export default {
       }
     },
   },
-};
+});
 </script>
 
 <style>
