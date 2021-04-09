@@ -1,41 +1,4 @@
 /* eslint-disable import/no-cycle */
-// import Vuex, { createStore, useStore as baseUseStore, Store } from 'vuex';
-// import Vue, { InjectionKey } from 'vue';
-
-// import { createDirectStore } from 'direct-vuex';
-// import TripModule, { TripModule } from './modules/TripModule';
-
-// import { State } from './models/Root';
-
-// // define injection key
-// export const key: InjectionKey<Store<State>> = Symbol('Store Symbol');
-
-// export const store = createStore<State>({
-//   state: {
-//   },
-//   getters: {
-//     vue() {
-//       // eslint-disable-next-line no-underscore-dangle
-//       return this._vm;
-//     },
-//     token(_, getters) {
-//       // Get the access token from the auth wrapper
-//       return getters.vue.$auth.getTokenSilently();
-//     },
-//   },
-//   mutations: {
-//   },
-//   actions: {
-//   },
-//   modules: {
-//     trip: TripModule,
-//   },
-// });
-
-// export function useStore() {
-//   return baseUseStore(key);
-// }
-
 import { createDirectStore } from 'direct-vuex';
 import TripModule from './modules/TripModule';
 

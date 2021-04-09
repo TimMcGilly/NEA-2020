@@ -12,9 +12,13 @@
   "dependencies": {
     "@auth0/auth0-spa-js": "^1.14.0",
     "@tailwindcss/forms": "^0.2.1",
+    "@types/leaflet": "^1.7.0",
     "axios": "^0.21.1",
     "core-js": "^3.10.0",
     "direct-vuex": "^1.0.0-rc3",
+    "leaflet": "^1.7.1",
+    "leaflet-geosearch": "^3.2.2",
+    "tailwindcss": "^2.0.4",
     "vue": "^3.0.11",
     "vue-router": "^4.0.5",
     "vuex": "^4.0.0"
@@ -46,7 +50,6 @@
     "postcss": "^8.2.9",
     "sass": "^1.32.8",
     "sass-loader": "^8.0.2",
-    "tailwindcss": "^2.0.4",
     "typescript": "^3.9.9"
   },
   "gitHooks": {

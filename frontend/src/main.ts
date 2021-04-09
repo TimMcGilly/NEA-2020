@@ -4,6 +4,9 @@ import router from './router';
 import store from './store';
 
 import './assets/css/tailwind.css';
+import '../node_modules/leaflet-geosearch/dist/geosearch.css';
+
+import '../node_modules/leaflet/dist/leaflet.css';
 
 // Import the plugin here
 import { setupAuth } from './auth';

@@ -1,5 +1,6 @@
 import { FieldPacket, RowDataPacket } from 'mysql2';
 import { PartialTrip, Trip } from '../../../shared/Trip';
+import { DateToYMDString } from '../../../shared/Utils/Date';
 import { getDb } from '../db';
 
 /**
@@ -11,7 +12,7 @@ export async function CreateTrip(user_id: number, partialTrip: PartialTrip): Pro
   let conn = null;
   const {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    name, start_date, end_date, loc_lat, loc_long, text_loc,
+    name, start_date, end_date, lat, lng, text_loc,
   } = partialTrip;
   try {
     conn = await getDb().getConnection();
@@ -19,14 +20,14 @@ export async function CreateTrip(user_id: number, partialTrip: PartialTrip): Pro
     await conn.beginTransaction();
 
     await conn.execute(`INSERT INTO trip 
-    (uuid, name, start_date, end_date, text_loc, location, user_id) 
-    VALUES(UUID_TO_BIN(UUID()),?,?,?,?,ST_GeomFromText('POINT(? ?)', 4326), ?)`,
-    [name, start_date, end_date, text_loc, loc_lat, loc_long, user_id]);
+    (uuid, name, start_date, end_date, lat, lng, text_loc, user_id) 
+    VALUES(UUID_TO_BIN(UUID()),?,?,?,?,?,?, 4326), ?)`,
+    [name, DateToYMDString(new Date(start_date)), DateToYMDString(new Date(end_date)), lat, lng, text_loc, user_id]);
 
     // Need to get uuid for trip object
     const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT * FROM trip WHERE id = LAST_INSERT_ID()');
 
-    // Expands partial trip plus uuid to make full trip
+    // Expands partial  trip plus uuid to make full trip
     const newTrip = new Trip({ uuid: rows[0].uuid, ...partialTrip });
 
     await conn.commit();

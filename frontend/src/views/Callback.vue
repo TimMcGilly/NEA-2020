@@ -5,7 +5,7 @@ which sets up basic callbacks for auth0. Boiler plate code -->
   <div />
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -14,7 +14,7 @@ export default defineComponent({
     if (this.$route.query.error) {
       console.log(this.$route.query.error_description);
       this.$auth.logout({
-        returnTo: `${window.location.origin}/error?error=${encodeURI(this.$route.query.error)}&error_description=${encodeURI(this.$route.query.error_description)}`,
+        returnTo: `${window.location.origin}/error?error=${encodeURI(this.$route.query.error as string)}&error_description=${encodeURI(this.$route.query.error_description as string)}`,
       });
     }
   },

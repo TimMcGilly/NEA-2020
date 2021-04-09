@@ -15,6 +15,7 @@ module.exports = {
   ],
   extends: [
     'airbnb-typescript/base',
+    "plugin:@typescript-eslint/recommended"
   ],
   ignorePatterns: [
     '.eslintrc.js',

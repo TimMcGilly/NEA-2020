@@ -35,8 +35,10 @@
   <router-view />
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   methods: {
     // Log the user in
     login() {
@@ -50,7 +52,7 @@ export default {
       });
     },
   },
-};
+});
 </script>
 <style lang="scss">
 

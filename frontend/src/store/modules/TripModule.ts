@@ -24,21 +24,26 @@ const TripModule = defineModule({
     },
   },
   actions: {
-    async newTripAsync(context, partialTrip: PartialTrip) {
+    async newTripAsync(context, partialTrip: PartialTrip): Promise<string[]> {
       const { commit, rootGetters } = TripModuleActionContext(context);
       const { token } = rootGetters;
 
       try {
-        const response = await axios.post('/api/trip', {
+        const res = await axios.post('/api/trip', {
           partialTrip,
         }, {
           headers: {
             Authorization: `Bearer ${await token}`, // send the access token through the 'Authorization' header
           },
         });
-        commit.addTrip(response.data.trip);
+        if (res.status === 201) {
+          commit.addTrip(new Trip(res.data.trip));
+          return [];
+        }
+        return res.data.error;
       } catch (error) {
         console.error(error);
+        return ['Internal error'];
       }
     },
     async fetchTripsAsync(context) {
@@ -56,7 +61,7 @@ const TripModule = defineModule({
 
         // eslint-disable-next-line prefer-destructuring
         const trips: Trip[] = response.data.trips;
-        trips.forEach((trip) => commit.addTrip(trip));
+        trips.forEach((trip) => commit.addTrip(new Trip(trip)));
       } catch (error) {
         console.error(error);
       }

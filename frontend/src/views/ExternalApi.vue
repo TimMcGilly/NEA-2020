@@ -7,10 +7,11 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import axios from 'axios';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'ExternalApi',
   data() {
     return {
@@ -32,5 +33,5 @@ export default {
       this.apiMessage = data;
     },
   },
-};
+});
 </script>
