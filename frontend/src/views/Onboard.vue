@@ -1,61 +1,65 @@
 <template>
-  <form
-    id="OnboardingForm"
-    class="max-w-xl mx-auto py-12 md:max-w-4xl"
-  >
-    <div class="p-4">
-      <label
-        for="name"
-        class="block text-gray-700"
-      >Name: </label>
-      <input
-        id="name"
-        v-model="name"
-        class="block form-simple"
-        type="text"
-        name="name"
-        required
-      >
-    </div>
-    <div class="p-4">
-      <label
-        for="dob"
-        class="block text-gray-700"
-      >Date Of Birth: </label>
-      <input
-        id="dob"
-        v-model="dob"
-        class="block form-simple"
-        type="date"
-        name="date-of-birth"
-        min="1850-01-01"
-        :max="maxDOB"
-      >
-    </div>
-    <div class="p-4">
-      <label
-        for="bio"
-        class="block text-gray-700"
-      >Bio Description: </label>
-      <textarea
-        id="bio"
-        v-model="bio"
-        class="block form-simple resize-none"
-        :rows="4"
-        :cols="50"
-        :maxlength="400"
-      />
-    </div>
-    <div class="px-4">
-      <button
-        type="button"
-        class="bg-gray-200 py-2 px-4 rounded hover:bg-gray-300"
-        @click="submitForm()"
-      >
-        Submit
-      </button>
-    </div>
-  </form>
+  <div class="max-w-xl mx-auto py-12 md:max-w-4xl">
+    <h1 class="text-2xl font-semibold m-4">
+      Account details
+    </h1>
+    <form
+      id="OnboardingForm"
+    >
+      <div class="p-4">
+        <label
+          for="name"
+          class="block text-gray-700"
+        >Name: </label>
+        <input
+          id="name"
+          v-model="name"
+          class="block form-simple"
+          type="text"
+          name="name"
+          required
+        >
+      </div>
+      <div class="p-4">
+        <label
+          for="dob"
+          class="block text-gray-700"
+        >Date Of Birth: </label>
+        <input
+          id="dob"
+          v-model="dob"
+          class="block form-simple"
+          type="date"
+          name="date-of-birth"
+          min="1850-01-01"
+          :max="maxDOB"
+        >
+      </div>
+      <div class="p-4">
+        <label
+          for="bio"
+          class="block text-gray-700"
+        >Bio Description: </label>
+        <textarea
+          id="bio"
+          v-model="bio"
+          class="block form-simple resize-none"
+          :rows="4"
+          :cols="50"
+          :maxlength="400"
+        />
+      </div>
+      <div class="px-4">
+        <button
+          type="button"
+          class="bg-gray-200 py-2 px-4 rounded hover:bg-gray-300"
+          @click="submitForm()"
+        >
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
 </template>
 
 <script lang="ts">

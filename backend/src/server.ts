@@ -44,8 +44,10 @@ AuthManager.init();
 app.use(checkJwt);
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     export interface Request {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       user?: any
     }
   }
@@ -67,18 +69,33 @@ app.post('/api/onboard',
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const values = {
-      auth0_id: req.user.sub,
-      name: req.body.name,
-      date_of_birth: req.body.dob,
-      bio_description: req.body.bio,
-    };
+    const values = [
+      req.user.sub,
+      req.body.name,
+      req.body.dob,
+      req.body.bio,
+    ];
 
+    let conn = null;
     try {
-      await getDb().execute('INSERT INTO user SET ?', values);
+      conn = await getDb().getConnection();
+      await conn.beginTransaction();
+
+      // Inserts new user
+      await getDb().execute('INSERT INTO user(auth0_id, name, date_of_birth, bio_description) VALUES (?,?,?,?)', values);
+
+      // Updates auth0 onboarded metabads
       AuthManager.updateAppMetadata(req.user.sub, { onboarded: true });
+      await conn.commit();
+      conn.release();
+
       return res.sendStatus(201);
     } catch (e) {
+      // If db error and conn still exists rollback and release
+      if (conn) {
+        await conn.rollback();
+        conn.release();
+      }
       console.log(e);
       return res.sendStatus(500);
     }
