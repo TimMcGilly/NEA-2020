@@ -5,6 +5,7 @@ import jwksRsa from 'jwks-rsa';
 import dotenv from 'dotenv';
 import { body, validationResult } from 'express-validator';
 
+import multer from 'multer';
 import { CreateTripController, FindAllTripsController } from './controllers/tripController';
 import { Date13YearAgo, DateToYMDString, AddDaysToDate } from '../../shared/Utils/Date';
 
@@ -23,6 +24,8 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static('../public/uploads'));
 
 // Define middleware that validates incoming bearer tokens
 // using JWKS from dev-eh5-3nx1.eu.auth0.com
@@ -60,7 +63,10 @@ app.get('/api/external', (req, res) => {
   });
 });
 
+const onboardUpload = multer({ dest: '../public/uploads/' });
+
 app.post('/api/onboard',
+  onboardUpload.single('avatar'),
   body('name', 'Empty name').trim().isLength({ min: 1 }).escape(),
   body('dob', 'Invalid age or under 13').isISO8601().toDate().isBefore(DateToYMDString(AddDaysToDate(Date13YearAgo(), 1))),
   async (req, res) => {
@@ -82,7 +88,7 @@ app.post('/api/onboard',
       await conn.beginTransaction();
 
       // Inserts new user
-      await getDb().execute('INSERT INTO user(auth0_id, name, date_of_birth, bio_description) VALUES (?,?,?,?)', values);
+      await getDb().execute('INSERT INTO user(auth0_id, name, date_of_birth, bio_description, avatar) VALUES (?,?,?,?)', values);
 
       // Updates auth0 onboarded metabads
       AuthManager.updateAppMetadata(req.user.sub, { onboarded: true });

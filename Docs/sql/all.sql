@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS `user` (
     `auth0_id` CHAR(100) UNIQUE NOT NULL,
     `name` VARCHAR(100) NOT NULL,
     `date_of_birth` DATE NOT NULL,
-    `bio_description` TEXT
+    `bio_description` TEXT,
+    `avatar` VARCHAR(1000)
 );
 CREATE TABLE IF NOT EXISTS `trip` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,

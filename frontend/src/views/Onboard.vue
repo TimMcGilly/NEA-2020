@@ -49,6 +49,27 @@
           :maxlength="400"
         />
       </div>
+      <div class="p-4">
+        <label
+          for="avatar"
+          class="block text-gray-700"
+        >Upload Avatar: </label>
+        <input
+          id="avatar"
+          type="file"
+          name="avatar"
+          accept="image/png, image/jpeg"
+        >
+        <textarea
+          id="bio"
+          v-model="bio"
+          class="block form-simple resize-none"
+          :rows="4"
+          :cols="50"
+          :maxlength="400"
+        />
+      </div>
+
       <div class="px-4">
         <button
           type="button"
@@ -66,7 +87,7 @@
 import axios from 'axios';
 import { defineComponent } from 'vue';
 import { Date13YearAgo, DateToYMDString } from '../../../shared/Utils/Date';
-
+import formData from 'form-data';
 export default defineComponent({
   name: 'Onboard',
   data() {
@@ -74,6 +95,7 @@ export default defineComponent({
       name: '',
       dob: '1970-01-01',
       bio: '',
+      avatar: 
     };
   },
   computed: {
@@ -90,6 +112,7 @@ export default defineComponent({
           name: this.name,
           dob: this.dob,
           bio: this.bio,
+          avatar: this.avatar,
         }, {
           headers: {
             Authorization: `Bearer ${token}`, // send the access token through the 'Authorization' header
