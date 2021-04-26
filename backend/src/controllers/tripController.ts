@@ -5,7 +5,7 @@ import * as trip from '../models/tripWrapper';
 
 export const CreateTripController = [
   body('partialTrip').exists(),
-  async function CreateTripController(req: Request, res: Response) {
+  async function CreateTripController(req: Request, res: Response): Promise<Response> {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -19,7 +19,7 @@ export const CreateTripController = [
 ];
 
 export const FindAllTripsController = [
-  async function FindAllTripsController(req: Request, res: Response) {
+  async function FindAllTripsController(req: Request, res: Response): Promise<Response> {
     const userId = await GetUserIDFromSub(req.user.sub);
 
     const trips = await trip.FindAllTrips(userId);

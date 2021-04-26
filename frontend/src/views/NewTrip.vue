@@ -165,6 +165,8 @@ export default defineComponent({
 
       // No errors so far so call backend api
 
+      // Create partial trip to send to vuex
+
       const latlng = this.marker.getLatLng();
       /* eslint-disable @typescript-eslint/camelcase */
       const newPartialTrip = new PartialTrip({
@@ -176,7 +178,8 @@ export default defineComponent({
         text_loc: this.address,
       });
       /* eslint-enable @typescript-eslint/camelcase */
-      console.log(this.$store.dispatch);
+
+      // Call vuex and recived any errors returned
       this.errors = await this.$store.direct.dispatch.TripModule.newTripAsync(newPartialTrip);
 
       if (this.errors.length === 0) {
@@ -198,13 +201,16 @@ export default defineComponent({
         shadowUrl,
       });
 
+      // Create Leaflet map
       const map = L.map(this.$refs.map as HTMLElement).setView([51.505, -0.09], 13);
       L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
+      // Adds custom marker to map
       this.marker.addTo(map);
 
+      // Create search bar for map
       const searchControl = GeoSearchControl({
         provider: new OpenStreetMapProvider({
           params: {
@@ -229,6 +235,8 @@ export default defineComponent({
       const lng = result.x;
       const lat = result.y;
       this.marker.setLatLng(L.latLng(lat, lng));
+
+      // Updates address textbox
       this.address = result.label;
     },
   },

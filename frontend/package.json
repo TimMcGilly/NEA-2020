@@ -16,7 +16,6 @@
     "axios": "^0.21.1",
     "core-js": "^3.10.0",
     "direct-vuex": "^1.0.0-rc3",
-    "form-data": "^4.0.0",
     "leaflet": "^1.7.1",
     "leaflet-geosearch": "^3.2.2",
     "tailwindcss": "^2.0.4",

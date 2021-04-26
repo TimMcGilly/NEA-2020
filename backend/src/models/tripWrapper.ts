@@ -21,7 +21,7 @@ export async function CreateTrip(user_id: number, partialTrip: PartialTrip): Pro
 
     await conn.execute(`INSERT INTO trip 
     (uuid, name, start_date, end_date, lat, lng, text_loc, user_id) 
-    VALUES(UUID_TO_BIN(UUID()),?,?,?,?,?,?, 4326), ?)`,
+    VALUES(UUID_TO_BIN(UUID()),?,?,?,?,?,?)`,
     [name, DateToYMDString(new Date(start_date)), DateToYMDString(new Date(end_date)), lat, lng, text_loc, user_id]);
 
     // Need to get uuid for trip object
@@ -56,7 +56,7 @@ export async function FindAllTrips(user_id : number): Promise<Trip[]> {
     // Turn rows into array of trips
     let newTrips: Trip[] = [];
     rows.forEach((r) => {
-      newTrips.push(new Trip(r as any));
+      newTrips.push(r as Trip);
     });
 
     if (newTrips.length === 0) { newTrips = []; }

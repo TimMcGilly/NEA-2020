@@ -6,6 +6,10 @@ import dotenv from 'dotenv';
 import { body, validationResult } from 'express-validator';
 
 import multer from 'multer';
+import { FieldPacket, RowDataPacket } from 'mysql2';
+import { promises as fs } from 'fs';
+import { extname } from 'path';
+
 import { CreateTripController, FindAllTripsController } from './controllers/tripController';
 import { Date13YearAgo, DateToYMDString, AddDaysToDate } from '../../shared/Utils/Date';
 
@@ -25,7 +29,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static('../public/uploads'));
+app.use(express.static('./public/uploads'));
 
 // Define middleware that validates incoming bearer tokens
 // using JWKS from dev-eh5-3nx1.eu.auth0.com
@@ -63,7 +67,7 @@ app.get('/api/external', (req, res) => {
   });
 });
 
-const onboardUpload = multer({ dest: '../public/uploads/' });
+const onboardUpload = multer({ dest: './public/uploads/avatars/' });
 
 app.post('/api/onboard',
   onboardUpload.single('avatar'),
@@ -88,7 +92,11 @@ app.post('/api/onboard',
       await conn.beginTransaction();
 
       // Inserts new user
-      await getDb().execute('INSERT INTO user(auth0_id, name, date_of_birth, bio_description, avatar) VALUES (?,?,?,?)', values);
+      await conn.execute('INSERT INTO user(auth0_id, uuid, name, date_of_birth, bio_description) VALUES (?,UUID_TO_BIN(UUID()),?,?,?)', values);
+
+      // Updates avatar file name to use user uuid
+      const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT BIN_TO_UUID(uuid, true) AS uuid FROM user WHERE id = LAST_INSERT_ID()');
+      await fs.rename(req.file.path, req.file.destination + rows[0].uuid + extname(req.file.originalname));
 
       // Updates auth0 onboarded metabads
       AuthManager.updateAppMetadata(req.user.sub, { onboarded: true });
