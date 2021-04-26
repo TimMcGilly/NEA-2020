@@ -18,8 +18,8 @@ export class PartialTrip {
 }
 
 export class Trip extends PartialTrip{
-    uuid: number;
-    constructor({ uuid, name, start_date, end_date, lat, lng, text_loc }: { uuid: number; name: string; start_date: Date; end_date: Date; lat: number; lng: number; text_loc: string; }) {
+    uuid: string;
+    constructor({ uuid, name, start_date, end_date, lat, lng, text_loc }: { uuid: string; name: string; start_date: Date; end_date: Date; lat: number; lng: number; text_loc: string; }) {
         super({ name, start_date, end_date, lat, lng, text_loc });
         this.uuid=uuid;
     }

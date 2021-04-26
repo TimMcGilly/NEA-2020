@@ -29,7 +29,7 @@ export default defineComponent({
   setup() {
     store.dispatch.TripModule.fetchTripsAsync();
     return {
-      trips: computed(() => store.state.TripModule.trips),
+      trips: computed(() => store.getters.TripModule.allTrips),
     };
   },
 });

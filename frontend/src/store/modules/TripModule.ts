@@ -5,22 +5,29 @@ import axios from 'axios';
 import { defineModule } from 'direct-vuex';
 import { Trip, PartialTrip } from '../../../../shared';
 
-import { moduleActionContext } from '../index';
+import { moduleActionContext, moduleGetterContext } from '../index';
 
 export interface TripModuleState {
-     trips: Trip[];
+     trips: Map<string, Trip>;
 }
 
 const TripModule = defineModule({
   namespaced: true as true,
   state: {
-    trips: [],
+    trips: new Map<string, Trip>(),
   } as TripModuleState,
   getters: {
+    allTrips(...args): Trip[] {
+      const {
+        state,
+      } = TripModuleGetterContext(args);
+
+      return Array.from(state.trips.values());
+    },
   },
   mutations: {
     addTrip(state, trip: Trip) {
-      state.trips.push(trip);
+      state.trips.set(trip.uuid, trip);
     },
   },
   actions: {
@@ -70,6 +77,7 @@ const TripModule = defineModule({
 });
 
 export default TripModule;
-// const TripModuleGetterContext = (args: [any, any, any, any]) => moduleGetterContext(args, TripModule);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const TripModuleActionContext = (context: any) => moduleActionContext(context, TripModule);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const TripModuleGetterContext = (args: [any, any, any, any]) => moduleGetterContext(args, TripModule);

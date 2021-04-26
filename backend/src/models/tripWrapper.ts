@@ -21,11 +21,11 @@ export async function CreateTrip(user_id: number, partialTrip: PartialTrip): Pro
 
     await conn.execute(`INSERT INTO trip 
     (uuid, name, start_date, end_date, lat, lng, text_loc, user_id) 
-    VALUES(UUID_TO_BIN(UUID()),?,?,?,?,?,?)`,
+    VALUES(UUID_TO_BIN(UUID()),?,?,?,?,?,?,?)`,
     [name, DateToYMDString(new Date(start_date)), DateToYMDString(new Date(end_date)), lat, lng, text_loc, user_id]);
 
     // Need to get uuid for trip object
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT * FROM trip WHERE id = LAST_INSERT_ID()');
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT BIN_TO_UUID(uuid, true) AS uuid FROM trip WHERE id = LAST_INSERT_ID()');
 
     // Expands partial  trip plus uuid to make full trip
     const newTrip = new Trip({ uuid: rows[0].uuid, ...partialTrip });
