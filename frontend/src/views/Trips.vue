@@ -1,11 +1,19 @@
 <template>
   <div>
-    <router-link
+    <!-- <router-link
       to="/trips/new"
       tag="button"
+      class="bg-gray-200 m-5 py-2 px-4 rounded hover:bg-gray-300"
     >
       New Trip
-    </router-link>
+    </router-link> -->
+
+    <button
+      class="bg-gray-200 py-2 px-4 rounded hover:bg-gray-300"
+      @click="$router.push('/trips/new')"
+    >
+      New Trip
+    </button>
     <div class="grid grid-cols-3 gap-4">
       <TripCard
         v-for="trip in trips"

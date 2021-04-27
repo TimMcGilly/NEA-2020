@@ -51,7 +51,7 @@ export async function FindAllTrips(user_id : number): Promise<Trip[]> {
     await conn.beginTransaction();
 
     // Get trip rows
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT * FROM trip WHERE user_id = ?', [user_id]);
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT BIN_TO_UUID(uuid, true) AS uuid, name, start_date, end_date, lat, lng, text_loc, user_id FROM trip WHERE user_id = ?', [user_id]);
 
     // Turn rows into array of trips
     let newTrips: Trip[] = [];
