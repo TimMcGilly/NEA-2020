@@ -31,13 +31,18 @@ CREATE TABLE IF NOT EXISTS `activitytotrip` (
     FOREIGN KEY (`trip_id`) REFERENCES `trip`(`id`) ON UPDATE CASCADE,
     `experience` ENUM ('beginner', 'intermediate', 'expert') NOT NULL
 );
+CREATE TABLE `chat` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT
+);
 CREATE TABLE IF NOT EXISTS `usermatch` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,
     `trip_id1` INT NOT NULL,
     FOREIGN KEY (`trip_id1`) REFERENCES `trip`(`id`) ON UPDATE CASCADE,
     `trip_id2` INT NOT NULL,
     FOREIGN KEY (`trip_id2`) REFERENCES `trip`(`id`) ON UPDATE CASCADE,
-    `status` ENUM ('requested', 'accepted')
+    `status` ENUM ('requested', 'accepted'),
+    `chat` INT NOT NULL,
+    FOREIGN KEY (`chat`) REFERENCES `chat`(`id`) ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS `textmessage` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,
@@ -59,7 +64,9 @@ CREATE TABLE IF NOT EXISTS `group` (
     `created_at` DATETIME NOT NULL,
     `max_members` INT NOT NULL,
     `creator_trip_id` INT NOT NULL,
-    FOREIGN KEY (`creator_trip_id`) REFERENCES `trip`(`id`) ON UPDATE CASCADE
+    FOREIGN KEY (`creator_trip_id`) REFERENCES `trip`(`id`) ON UPDATE CASCADE,
+    `chat` INT NOT NULL,
+    FOREIGN KEY (`chat`) REFERENCES `chat`(`id`) ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS `triptogroup` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,
