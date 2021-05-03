@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { ErrorRequestHandler } from 'express';
 import jwt from 'express-jwt';
 import jwksRsa from 'jwks-rsa';
 
@@ -10,6 +10,7 @@ import { FieldPacket, RowDataPacket } from 'mysql2';
 import { promises as fs } from 'fs';
 import { extname } from 'path';
 
+import { GetUserController } from './controllers/userController';
 import { CreateTripController, FindAllTripsController } from './controllers/tripController';
 import { Date13YearAgo, DateToYMDString, AddDaysToDate } from '../../shared/Utils/Date';
 
@@ -18,6 +19,7 @@ import authConfig from '../auth_config.json';
 import * as AuthManager from './authManager';
 
 import { initDb, getDb } from './db';
+import { ErrorFmt } from './utils/request';
 
 initDb();
 
@@ -59,6 +61,15 @@ declare global {
     }
   }
 }
+
+/**
+ * Global express error handler.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use(((err, req, res, _next) => {
+  console.error(err.stack);
+  res.status(500).send(ErrorFmt('Interal server error'));
+}) as ErrorRequestHandler);
 
 // Define an endpoint that must be called with an access token
 app.get('/api/external', (req, res) => {
@@ -118,6 +129,9 @@ app.post('/api/onboard',
 /// Trip Route ///
 app.get('/api/trip', ...FindAllTripsController);
 app.post('/api/trip', ...CreateTripController);
+
+/// User Route ///
+app.get('/api/user', ...GetUserController);
 
 // Start the app
 app.listen(3001, () => console.log('API listening on 3001'));

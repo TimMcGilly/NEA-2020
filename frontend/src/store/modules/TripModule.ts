@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable import/no-cycle */
 
+import { ResponseHandler } from '@/utils/response';
 import axios from 'axios';
 import { defineModule } from 'direct-vuex';
 import { Trip, PartialTrip } from '../../../../shared';
@@ -27,27 +28,36 @@ const TripModule = defineModule({
   },
   mutations: {
     addTrip(state, trip: Trip) {
+      console.log(trip);
       state.trips.set(trip.uuid, trip);
     },
   },
   actions: {
+    /**
+     * Adds new trip to backend and vuex store
+     * @param context Vuex context
+     * @param partialTrip Partial Trip object to be added
+     * @returns Array of errors
+     */
     async newTripAsync(context, partialTrip: PartialTrip): Promise<string[]> {
       const { commit, rootGetters } = TripModuleActionContext(context);
       const { token } = rootGetters;
 
       try {
-        const res = await axios.post('/api/trip', {
+        const res = new ResponseHandler(await axios.post('/api/trip', {
           partialTrip,
         }, {
           headers: {
             Authorization: `Bearer ${await token}`, // send the access token through the 'Authorization' header
           },
-        });
-        if (res.status === 201) {
-          commit.addTrip(new Trip(res.data.trip));
-          return [];
-        }
-        return res.data.error;
+        }));
+
+        // If error return error array to form
+        if (!res.isSuccess) { return res.failArray; }
+
+        console.log(res.data.trip);
+        commit.addTrip(new Trip(res.data.trip));
+        return [];
       } catch (error) {
         console.error(error);
         return ['Internal error'];
@@ -60,14 +70,14 @@ const TripModule = defineModule({
 
       // Use Axios to make a call to the /api/trips
       try {
-        const response = await axios.get('/api/trip', {
+        const res = new ResponseHandler(await axios.get('/api/trip', {
           headers: {
             Authorization: `Bearer ${await token}`, // send the access token through the 'Authorization' header
           },
-        });
+        }));
 
         // eslint-disable-next-line prefer-destructuring
-        const trips: Trip[] = response.data.trips;
+        const trips: Trip[] = res.data.trips;
         trips.forEach((trip) => commit.addTrip(new Trip(trip)));
       } catch (error) {
         console.error(error);

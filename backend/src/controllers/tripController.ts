@@ -1,20 +1,17 @@
-import { body, validationResult } from 'express-validator';
+import { body } from 'express-validator';
 import { Request, Response } from 'express';
-import { GetUserIDFromSub } from '../utils/User';
+import { CheckValidation, SuccessFmt } from '../utils/request';
+import { GetUserIDFromSub } from '../utils/user';
 import * as trip from '../models/tripWrapper';
 
 export const CreateTripController = [
   body('partialTrip').exists(),
+  CheckValidation,
   async function CreateTripController(req: Request, res: Response): Promise<Response> {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const userId = await GetUserIDFromSub(req.user.sub);
-    const newTrip = trip.CreateTrip(userId, req.body.partialTrip);
+    const newTrip = await trip.CreateTrip(userId, req.body.partialTrip);
 
-    return res.status(201).json({ trip: newTrip });
+    return res.status(201).json(SuccessFmt({ trip: newTrip }));
   },
 ];
 
@@ -24,6 +21,6 @@ export const FindAllTripsController = [
 
     const trips = await trip.FindAllTrips(userId);
 
-    return res.status(200).json({ trips });
+    return res.status(200).json(SuccessFmt({ trips }));
   },
 ];

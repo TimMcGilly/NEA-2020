@@ -1,15 +1,7 @@
 <template>
-  <div>
-    <!-- <router-link
-      to="/trips/new"
-      tag="button"
-      class="bg-gray-200 m-5 py-2 px-4 rounded hover:bg-gray-300"
-    >
-      New Trip
-    </router-link> -->
-
+  <div class="max-w-8xl w-3/4 mx-auto py-12 md:max-w-6xl">
     <button
-      class="bg-gray-200 py-2 px-4 rounded hover:bg-gray-300"
+      class="bg-gray-200 py-2 px-4 rounded hover:bg-gray-300 shadow"
       @click="$router.push('/trips/new')"
     >
       New Trip

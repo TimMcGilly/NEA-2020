@@ -1,6 +1,7 @@
 /* eslint-disable import/no-cycle */
 import { createDirectStore } from 'direct-vuex';
 import TripModule from './modules/TripModule';
+import UserModule from './modules/UserModule';
 
 export interface RootState {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,6 +32,7 @@ const {
   },
   modules: {
     TripModule,
+    UserModule,
   },
 });
 
