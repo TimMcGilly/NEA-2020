@@ -13,7 +13,6 @@
       Profile
     </router-link>
 
-    <p>{{ $auth.user.value }}</p>
     <!-- Check that the SDK client is not currently loading before accessing is methods -->
     <div v-if="!$auth.loading.value">
       <!-- show login when not authenticated -->
@@ -36,14 +35,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
+import { PrivateUserDetails } from '../../shared';
+import store from './store';
 
 export default defineComponent({
+  setup() {
+    console.log('here2');
+
+    store.dispatch.UserModule.fetchUserAsync();
+    return {
+      user: computed(() => (store.state.UserModule.ownerDetails as PrivateUserDetails)),
+    };
+  },
   methods: {
     // Log the user in
     login() {
       this.$auth.loginWithRedirect();
-      console.log(this.$auth.user.value);
+      store.dispatch.UserModule.fetchUserAsync();
     },
     // Log the user out
     logout() {

@@ -49,7 +49,7 @@ export function init() {
     .catch((err) => err);
 }
 
-export function updateAppMetadata(user_id: string, metadata: any) {
+export function updateAppMetadata(user_id: string, metadata: any): void {
   const params = { id: user_id };
   managementClient.updateAppMetadata(params, metadata, (err, _) => {
     if (err) {

@@ -18,7 +18,16 @@
       "name": "vuejs: firefox",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}/frontend/src",
-      "pathMappings": [{ "url": "webpack:///src/", "path": "${webRoot}/" }]
+      "pathMappings": [
+        {
+          "url": "webpack://frontend/src",
+          "path": "${workspaceFolder}/frontend/src"
+        },
+        {
+          "url": "webpack:///src/",
+          "path": "${webRoot}/"
+        }
+      ]
     }
   ]
 }
