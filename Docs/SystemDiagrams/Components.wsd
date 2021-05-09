@@ -1,0 +1,8 @@
+@startuml
+
+[Vuex]
+[Vue (HTML, CSS, Javascript)] as Vue
+component Comp3
+component [Last\ncomponent] as Comp4
+
+@enduml

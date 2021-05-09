@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { SuccessFmt } from '../utils/request';
+import { SuccessFmt } from '../utils/response';
 import { GetPrivateUserDetails } from '../models/userWrapper';
 
 export const GetUserController = [

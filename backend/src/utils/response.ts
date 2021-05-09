@@ -6,25 +6,7 @@
 
 import { RequestHandler } from 'express';
 import { Result, ValidationError, validationResult } from 'express-validator';
-
-type APIResponseSuccess = {
-  status: 'success',
-  data: unknown
-};
-
-type APIResponseFail = {
-  status: 'fail',
-  data: string[]
-};
-
-type APIResponseError = {
-  status: 'error',
-  message: string,
-  data?: unknown,
-  code?: number
-};
-
-export type APIResponse = APIResponseSuccess | APIResponseFail | APIResponseError;
+import { APIResponse } from '../../../shared';
 
 /**
  * Formats successful request to Jsend spec
@@ -40,10 +22,10 @@ export function SuccessFmt(data: unknown): APIResponse {
 
 /**
  * Formats fail request to Jsend spec. Used for validation fails or bad input
- * @param errors Array of error messages to return in request
+ * @param errors Error key value pairs to return in request
  * @returns Formatted request
  */
-export function FailFmt(errors: string[]): APIResponse {
+export function FailFmt(errors: {[k: string]: unknown}): APIResponse {
   return {
     status: 'fail',
     data: errors,
@@ -70,10 +52,10 @@ export function ErrorFmt(message: string, data?: unknown, code?: number): APIRes
  * @param errors Validation errors from validator.js
  * @returns Formatted error message string array
  */
-function FormatValidatorErrors(errors: Result<ValidationError>): string[] {
-  const formattedErrors: string[] = [];
+function FormatValidatorErrors(errors: Result<ValidationError>): {[k: string]: string} {
+  const formattedErrors: {[k: string]: string} = {};
   errors.array().forEach((e) => {
-    formattedErrors.push(`${e.param}: ${e.msg}`);
+    formattedErrors[e.param] = e.msg;
   });
 
   return formattedErrors;

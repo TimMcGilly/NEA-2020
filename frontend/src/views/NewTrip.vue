@@ -1,3 +1,4 @@
+<!-- New trip form view -->
 <template>
   <div class="max-w-xl mx-auto py-12 md:max-w-4xl">
     <h1 class="text-2xl font-semibold m-4">

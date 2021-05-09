@@ -8,11 +8,11 @@ export class ResponseHandler {
     }
 
     get isSuccess(): boolean {
-      return this.res.data.status === 'success' || !this.HasErrorStatusCode();
+      return this.res.data.status === 'success' && !this.HasErrorStatusCode();
     }
 
     get isFail(): boolean {
-      return this.res.data.status === 'fail' || !this.HasErrorStatusCode();
+      return this.res.data.status === 'fail' && !this.HasErrorStatusCode();
     }
 
     get isError(): boolean {
@@ -30,10 +30,18 @@ export class ResponseHandler {
       return this.res.data.message;
     }
 
+    /**
+     * Returns formatted string array of all errors
+     */
     get failArray(): string[] {
+      // Formats fail as string array from object.
       if (this.isFail) {
-        return this.res.data.data;
+        const failArray = [];
+        Object.keys(this.res.data.data).forEach((key) => {
+          failArray.push(`${key}: ${this.res.data.data[key]}`);
+        });
       }
+
       if (this.isError) { return [`Internal Error: ${this.res.data.message}`]; }
       return [];
     }

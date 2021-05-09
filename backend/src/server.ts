@@ -19,7 +19,7 @@ import authConfig from '../auth_config.json';
 import * as AuthManager from './authManager';
 
 import { initDb, getDb } from './db';
-import { ErrorFmt } from './utils/request';
+import { ErrorFmt } from './utils/response';
 
 initDb();
 
@@ -68,7 +68,7 @@ declare global {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use(((err, req, res, _next) => {
   console.error(err.stack);
-  res.status(500).send(ErrorFmt('Interal server error'));
+  res.status(500).send(ErrorFmt('Internal server error'));
 }) as ErrorRequestHandler);
 
 // Define an endpoint that must be called with an access token

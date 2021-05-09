@@ -1,6 +1,6 @@
 import { body } from 'express-validator';
 import { Request, Response } from 'express';
-import { CheckValidation, SuccessFmt } from '../utils/request';
+import { CheckValidation, SuccessFmt } from '../utils/response';
 import { GetUserIDFromSub } from '../utils/user';
 import * as trip from '../models/tripWrapper';
 

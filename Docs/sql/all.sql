@@ -29,9 +29,10 @@ CREATE TABLE IF NOT EXISTS `activitytotrip` (
     FOREIGN KEY (`activity_id`) REFERENCES `activity`(`id`) ON UPDATE CASCADE,
     `trip_id` INT NOT NULL,
     FOREIGN KEY (`trip_id`) REFERENCES `trip`(`id`) ON UPDATE CASCADE,
-    `experience` ENUM ('beginner', 'intermediate', 'expert') NOT NULL
+    `experience` ENUM ('beginner', 'intermediate', 'expert') NOT NULL,
+    `style` ENUM ('casual', 'serious') NOT NULL
 );
-CREATE TABLE `chat` (
+CREATE TABLE IF NOT EXISTS `chat` (
   `id` INT PRIMARY KEY AUTO_INCREMENT
 );
 CREATE TABLE IF NOT EXISTS `usermatch` (
