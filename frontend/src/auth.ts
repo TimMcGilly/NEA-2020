@@ -78,7 +78,7 @@ function logout(o: LogoutOptions) {
 }
 
 // Exposed to vue so function can be called.
-const authPlugin = {
+export const authPlugin = {
   isAuthenticated: computed(() => state.isAuthenticated),
   loading: computed(() => state.loading),
   user: computed(() => state.user),
@@ -127,7 +127,7 @@ export const onboardingRouteGuard = (to: any, from: any, next: Function) => {
       && (user.value as { [key: string]: any })[`${authConfig.audience}_onboarded`] === false) {
       return next('/onboard');
     }
-    if (to.path === '/onboard'
+    if ((to.path === '/onboard' || to.path === '/')
       && isAuthenticated.value
       && (user.value as { [key: string]: any })[`${authConfig.audience}_onboarded`] === true) {
       return next('/trips');

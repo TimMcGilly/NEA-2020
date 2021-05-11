@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable import/no-cycle */
 
+import { ResponseHandler } from '@/utils/response';
 import axios from 'axios';
 import { defineModule } from 'direct-vuex';
 import { PrivateUserDetails } from '../../../../shared';
@@ -23,28 +24,22 @@ const UserModule = defineModule({
   },
   actions: {
     async fetchUserAsync(context): Promise<string[]> {
-      console.log('here');
       const { commit, rootGetters } = UserModuleActionContext(context);
-      console.log('wat12');
 
       const { token } = rootGetters;
-      console.log('wat2');
 
       try {
-        console.log('wat');
-
-        const res = await axios.post('/api/user', {}, {
+        const res = new ResponseHandler(await axios.get('/api/user', {
           headers: {
             Authorization: `Bearer ${await token}`, // send the access token through the 'Authorization' header
           },
-        });
-        console.log('here');
+        }));
         console.log(res);
-        if (res.status === 201) {
+        if (res.isSuccess) {
           commit.updateUser(new PrivateUserDetails(res.data.user));
           return [];
         }
-        return res.data.error;
+        return res.failArray;
       } catch (error) {
         console.error(error);
         return ['Internal error'];

@@ -8,7 +8,7 @@ import { body, validationResult } from 'express-validator';
 import multer from 'multer';
 import { FieldPacket, RowDataPacket } from 'mysql2';
 import { promises as fs } from 'fs';
-import { extname } from 'path';
+import path, { extname } from 'path';
 
 import { GetUserController } from './controllers/userController';
 import { CreateTripController, FindAllTripsController } from './controllers/tripController';
@@ -31,7 +31,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static('./public/uploads'));
+app.use('/api', express.static(path.join(__dirname, '../public/uploads')));
 
 // Define middleware that validates incoming bearer tokens
 // using JWKS from dev-eh5-3nx1.eu.auth0.com
@@ -50,7 +50,7 @@ const checkJwt = jwt({
 
 AuthManager.init();
 
-app.use(checkJwt);
+app.use(checkJwt.unless({ path: ['/api/avatars/'] }));
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace

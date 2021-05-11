@@ -13,6 +13,12 @@
       Profile
     </router-link>
 
+    <img
+      v-if="user"
+      class="w-16 h-16 rounded-full"
+      :src="'/api/avatars/' + user.uuid +'.jpg'"
+    >
+
     <!-- Check that the SDK client is not currently loading before accessing is methods -->
     <div v-if="!$auth.loading.value">
       <!-- show login when not authenticated -->
@@ -35,17 +41,18 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, getCurrentInstance } from 'vue';
 import { PrivateUserDetails } from '../../shared';
 import store from './store';
 
 export default defineComponent({
   setup() {
-    console.log('here2');
-
+    const internalInstance = getCurrentInstance();
+    store.commit.setAuthPlugin(internalInstance?.appContext.config.globalProperties.$auth);
     store.dispatch.UserModule.fetchUserAsync();
+
     return {
-      user: computed(() => (store.state.UserModule.ownerDetails as PrivateUserDetails)),
+      user: computed(() => (store.state.UserModule.ownerDetails)),
     };
   },
   methods: {

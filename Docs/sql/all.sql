@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `usermatch` (
     FOREIGN KEY (`trip_id1`) REFERENCES `trip`(`id`) ON UPDATE CASCADE,
     `trip_id2` INT NOT NULL,
     FOREIGN KEY (`trip_id2`) REFERENCES `trip`(`id`) ON UPDATE CASCADE,
-    `status` ENUM ('requested', 'accepted'),
+    `status` ENUM ('requested', 'accepted', 'rejected'),
     `chat` INT NOT NULL,
     FOREIGN KEY (`chat`) REFERENCES `chat`(`id`) ON UPDATE CASCADE
 );

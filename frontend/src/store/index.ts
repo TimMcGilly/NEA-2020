@@ -5,7 +5,7 @@ import UserModule from './modules/UserModule';
 
 export interface RootState {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vue: any;
+  authPlugin: any;
 }
 
 const {
@@ -16,18 +16,18 @@ const {
   moduleGetterContext,
 } = createDirectStore({
   state: {
-    vue: null,
+    authPlugin: null,
   } as RootState,
   getters: {
     token(...args): string {
       const state = args[0];
-      return state.vue.$auth.getTokenSilently();
+      return state.authPlugin.getTokenSilently();
     },
   },
   mutations: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setVueInstance(state, vue: any) {
-      state.vue = vue;
+    setAuthPlugin(state, authPlugin: any) {
+      state.authPlugin = authPlugin;
     },
   },
   modules: {

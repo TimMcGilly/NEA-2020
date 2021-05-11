@@ -22,6 +22,6 @@ function callbackRedirect(appState: any) {
   );
 }
 setupAuth(authConfig, callbackRedirect).then((auth) => {
-  const vm = app.use(auth).mount('#app');
-  store.commit.setVueInstance(vm);
+  // Creates vue instance
+  app.use(auth).mount('#app');
 });
