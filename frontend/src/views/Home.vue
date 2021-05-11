@@ -1,21 +1,26 @@
 <template>
-  <div class="home">
-    <img
-      alt="Vue logo"
-      src="../assets/logo.png"
+  <div class="wide-page">
+    <h1>NEA 2020/2021</h1>
+    <p>Please Signup or login</p>
+    <button
+      class="button-primary"
+      @click="login"
     >
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+      Sign Up / Log in
+    </button>
   </div>
 </template>
 
 <script lang="ts">
+import store from '@/store';
 import { defineComponent } from 'vue';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 
 export default defineComponent({
   name: 'Home',
-  components: {
-    HelloWorld,
+  methods: {
+    login() {
+      store.dispatch.UserModule.login();
+    },
   },
 });
 </script>

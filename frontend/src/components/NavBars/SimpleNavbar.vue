@@ -38,7 +38,7 @@
         class="button-primary text-black my-5"
         @click="login"
       >
-        Log in
+        Sign Up / Log in
       </button>
 
       <button
@@ -69,14 +69,11 @@ export default defineComponent({
   methods: {
     // Log the user in
     login() {
-      this.$auth.loginWithRedirect();
-      store.dispatch.UserModule.fetchUserAsync();
+      store.dispatch.UserModule.login();
     },
     // Log the user out
     logout() {
-      this.$auth.logout({
-        returnTo: window.location.origin,
-      });
+      store.dispatch.UserModule.logout(window.location.origin);
     },
   },
 });

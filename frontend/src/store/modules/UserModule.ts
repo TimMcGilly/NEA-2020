@@ -21,6 +21,9 @@ const UserModule = defineModule({
     updateUser(state, user: PrivateUserDetails) {
       state.ownerDetails = user;
     },
+    clearUser(state) {
+      state.ownerDetails = null;
+    },
   },
   actions: {
     async fetchUserAsync(context): Promise<string[]> {
@@ -43,6 +46,23 @@ const UserModule = defineModule({
         console.error(error);
         return ['Internal error'];
       }
+    },
+    login(context) {
+      const { rootState } = UserModuleActionContext(context);
+
+      rootState.authPlugin.loginWithRedirect();
+      this.fetchUserAsync(context);
+    },
+    /**
+     * Logouts user
+     * @param windowOrigin Pass in window.location.origin
+     */
+    logout(context, windowOrigin: string) {
+      const { commit, rootState } = UserModuleActionContext(context);
+      rootState.authPlugin.logout({
+        returnTo: windowOrigin,
+      });
+      commit.clearUser();
     },
   },
 });

@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS `user` (
     `uuid` BINARY(16) UNIQUE NOT NULL,
     `name` VARCHAR(100) NOT NULL,
     `date_of_birth` DATE NOT NULL,
-    `bio_description` TEXT
+    `bio_description` TEXT,
+    `avatar` TEXT
 );
 CREATE TABLE IF NOT EXISTS `trip` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,
@@ -62,6 +63,7 @@ CREATE TABLE IF NOT EXISTS `blobmessage` (
 CREATE TABLE IF NOT EXISTS `group` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,
     `status` ENUM ('draft', 'public', 'private') NOT NULL,
+    `avatar` TEXT,
     `created_at` DATETIME NOT NULL,
     `max_members` INT NOT NULL,
     `creator_trip_id` INT NOT NULL,

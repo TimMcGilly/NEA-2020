@@ -15,4 +15,7 @@
     h1{
         @apply text-2xl font-semibold my-4
     }
+    .wide-page{
+        @apply max-w-7xl w-3/4 mx-auto py-12 md:max-w-6xl
+    }
 }
