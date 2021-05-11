@@ -25,7 +25,7 @@
         <img
           v-if="user"
           class="w-10 h-10 rounded-full items-center"
-          :src="'/api/avatars/' + user.uuid +'.jpg'"
+          :src="'/api/avatars/' + user.avatar"
         >
         <p class="mx-auto">
           Profile
@@ -43,7 +43,7 @@
 
       <button
         v-if="$auth.isAuthenticated.value"
-        class="button-primary text-black my-5"
+        class="button-primary text-black my-5 my-auto"
         @click="logout"
       >
         Log out

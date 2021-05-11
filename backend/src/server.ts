@@ -107,8 +107,10 @@ app.post('/api/onboard',
 
       // Updates avatar file name to use user uuid
       const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT BIN_TO_UUID(uuid, true) AS uuid FROM user WHERE id = LAST_INSERT_ID()');
-      await fs.rename(req.file.path, req.file.destination + rows[0].uuid + extname(req.file.originalname));
+      const newFileName = rows[0].uuid + extname(req.file.originalname);
+      await fs.rename(req.file.path, req.file.destination + newFileName);
 
+      await conn.execute('UPDATE user SET avatar = ? WHERE id = LAST_INSERT_ID()', [newFileName]);
       // Updates auth0 onboarded metabads
       AuthManager.updateAppMetadata(req.user.sub, { onboarded: true });
       await conn.commit();
