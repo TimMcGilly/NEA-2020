@@ -1,75 +1,42 @@
 <template>
-  <div id="nav">
-    <router-link to="/">
-      Home
-    </router-link> |
-    <router-link to="/about">
-      About
-    </router-link>
-    <router-link
-      v-if="$auth.isAuthenticated.value"
-      to="/profile"
+  <SimpleNavbar />
+  <router-view v-slot="{ Component, route }">
+    <!-- Use any custom transition and fallback to `fade` -->
+    <transition
+      :name="route.meta.transition || 'fade'"
+      mode="out-in"
     >
-      Profile
-    </router-link>
-
-    <img
-      v-if="user"
-      class="w-16 h-16 rounded-full"
-      :src="'/api/avatars/' + user.uuid +'.jpg'"
-    >
-
-    <!-- Check that the SDK client is not currently loading before accessing is methods -->
-    <div v-if="!$auth.loading.value">
-      <!-- show login when not authenticated -->
-      <button
-        v-if="!$auth.isAuthenticated.value"
-        @click="login"
-      >
-        Log in
-      </button>
-      <!-- show logout when authenticated -->
-      <button
-        v-if="$auth.isAuthenticated.value"
-        @click="logout"
-      >
-        Log out
-      </button>
-    </div>
-  </div>
-  <router-view />
+      <component :is="Component" />
+    </transition>
+  </router-view>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, getCurrentInstance } from 'vue';
-import { PrivateUserDetails } from '../../shared';
+import { defineComponent, getCurrentInstance } from 'vue';
+import SimpleNavbar from '@/components/NavBars/SimpleNavbar.vue';
+
 import store from './store';
 
 export default defineComponent({
+  components: {
+    SimpleNavbar,
+  },
   setup() {
     const internalInstance = getCurrentInstance();
     store.commit.setAuthPlugin(internalInstance?.appContext.config.globalProperties.$auth);
-    store.dispatch.UserModule.fetchUserAsync();
+  },
 
-    return {
-      user: computed(() => (store.state.UserModule.ownerDetails)),
-    };
-  },
-  methods: {
-    // Log the user in
-    login() {
-      this.$auth.loginWithRedirect();
-      store.dispatch.UserModule.fetchUserAsync();
-    },
-    // Log the user out
-    logout() {
-      this.$auth.logout({
-        returnTo: window.location.origin,
-      });
-    },
-  },
 });
 </script>
 <style lang="scss">
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.05s ease;
+}
+
+.fade-enter-from,
+.fade-leave-active {
+  opacity: 0;
+}
 
 </style>

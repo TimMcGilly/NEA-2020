@@ -34,7 +34,6 @@ const UserModule = defineModule({
             Authorization: `Bearer ${await token}`, // send the access token through the 'Authorization' header
           },
         }));
-        console.log(res);
         if (res.isSuccess) {
           commit.updateUser(new PrivateUserDetails(res.data.user));
           return [];

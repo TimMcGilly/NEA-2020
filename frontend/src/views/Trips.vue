@@ -1,5 +1,6 @@
 <template>
   <div class="max-w-8xl w-3/4 mx-auto py-12 md:max-w-6xl">
+    <h1>Trips</h1>
     <button
       class="bg-gray-200 py-2 px-4 rounded hover:bg-gray-300 shadow"
       @click="$router.push('/trips/new')"
