@@ -6,7 +6,7 @@ import axios from 'axios';
 import { defineModule } from 'direct-vuex';
 import { PrivateUserDetails } from '../../../../shared';
 
-import { moduleActionContext, moduleGetterContext } from '../index';
+import { moduleActionContext } from '../index';
 
 export interface UserModuleState {
   ownerDetails: PrivateUserDetails|null;
@@ -70,5 +70,3 @@ const UserModule = defineModule({
 export default UserModule;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const UserModuleActionContext = (context: any) => moduleActionContext(context, UserModule);
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const UserModuleGetterContext = (args: [any, any, any, any]) => moduleGetterContext(args, UserModule);

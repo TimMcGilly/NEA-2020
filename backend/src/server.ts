@@ -12,6 +12,7 @@ import path, { extname } from 'path';
 
 import { GetUserController } from './controllers/userController';
 import { CreateTripController, FindAllTripsController } from './controllers/tripController';
+import { GetActivitesCategoriesController } from './controllers/activityController';
 import { Date13YearAgo, DateToYMDString, AddDaysToDate } from '../../shared/Utils/Date';
 
 import authConfig from '../auth_config.json';
@@ -134,6 +135,9 @@ app.post('/api/trip', ...CreateTripController);
 
 /// User Route ///
 app.get('/api/user', ...GetUserController);
+
+/// Activity Route ///
+app.get('/api/activites/categories', ...GetActivitesCategoriesController);
 
 // Start the app
 app.listen(3001, () => console.log('API listening on 3001'));

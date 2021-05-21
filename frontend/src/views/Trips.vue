@@ -2,7 +2,7 @@
   <div class="wide-page">
     <h1>Trips</h1>
     <button
-      class="bg-gray-200 py-2 px-4 rounded hover:bg-gray-300 shadow"
+      class="button-primary"
       @click="$router.push('/trips/new')"
     >
       New Trip

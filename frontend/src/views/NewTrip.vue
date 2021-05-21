@@ -1,17 +1,15 @@
 <!-- New trip form view -->
 <template>
-  <div class="max-w-xl mx-auto py-12 md:max-w-4xl">
-    <h1 class="text-2xl font-semibold m-4">
+  <div class="max-w-xl mx-auto py-12 px-4 md:max-w-4xl">
+    <h1 class="text-2xl font-semibold">
       New Trip
     </h1>
     <form
-      id="OnboardingForm"
+      id="NewTripForm"
+      class="space-y-6"
       @submit="submitForm"
     >
-      <div
-        v-if="errors.length"
-        class="m-4"
-      >
+      <div v-if="errors.length">
         <b>Please correct the following error(s):</b>
         <ul>
           <li
@@ -22,11 +20,10 @@
           </li>
         </ul>
       </div>
-
-      <div class="m-4">
+      <div>
         <label
-          for="name"
           class="block text-gray-700"
+          for="name"
         >Name:</label>
         <input
           v-model="name"
@@ -36,43 +33,43 @@
           required
         >
       </div>
-
-      <div class="m-4">
-        <label
-          for="startDate"
-          class="block text-gray-700"
-        >Trip start date:</label>
-        <input
-          id="startDate"
-          v-model="startDate"
-          class="block form-simple"
-          type="date"
-          min="1850-01-01"
-        >
-      </div>
-      <div class="m-4">
-        <label
-          for="endDate"
-          class="block text-gray-700"
-        >Trip end date:</label>
-        <input
-          id="endDate"
-          v-model="endDate"
-          class="block form-simple"
-          type="date"
-          :min="todaysDate"
-        >
+      <div class="inline-block">
+        <div class="inline-block">
+          <label
+            class="block text-gray-700"
+            for="startDate"
+          >Trip start date:</label>
+          <input
+            id="startDate"
+            v-model="startDate"
+            class="block form-simple"
+            type="date"
+            min="1850-01-01"
+          >
+        </div>
+        <div class="inline-block mx-5 mb-2">
+          <label
+            class="block text-gray-700"
+            for="endDate"
+          >Trip end date:</label>
+          <input
+            id="endDate"
+            v-model="endDate"
+            class="block form-simple"
+            type="date"
+            :min="todaysDate"
+          >
+        </div>
       </div>
       <div
         id="map"
         ref="map"
-        class="m-4 w-3/4 h-80"
+        class="w-3/4 h-80"
       />
-
-      <div class="m-4">
+      <div>
         <label
-          for="address"
           class="block text-gray-700"
+          for="address"
         >Address:</label>
         <input
           v-model="address"
@@ -82,10 +79,79 @@
           required
         >
       </div>
+      <div class="w-3/4">
+        <label class="text-gray-700">Activites:</label>
+        <div class="flex flex-wrap border p-1">
+          <div
+            class="flex flex-col"
+            :class="{ 'w-1/2': selectedActivity != null}"
+          >
+            <ActivityCard
+              v-for="(activity, index) in activites"
+              :key="index"
+              :activity="activity"
+              :class="{ 'bg-gray-300': selectedActivityIndex == index}"
+              @click="selectActivity(activity, index)"
+            />
+            <button
+              class="button-primary text-sm h-10 mx-5 my-2"
+              @click="createActivity"
+            >
+              + New Activity
+            </button>
+          </div>
+          <div
+            v-if="selectedActivity"
+            class="w-1/2 border-l pl-2 space-y-2"
+          >
+            <p>Activity Type</p>
+            <select
+              v-model="selectedActivityCatergory"
+              @change="setActivityCatergory"
+            >
+              <option
+                disabled
+              >
+                Please select one
+              </option>
+              <option
+                v-for="cat in activityCategories"
+                :key="cat.type_id"
+                :value="cat.type_id"
+              >
+                {{ cat.name }}
+              </option>
+            </select>
+            <p>Experience</p>
+            <select v-model="selectedActivity.experience">
+              <option
+                disabled
+                value=""
+              >
+                Please select one
+              </option>
+              <option>Beginner</option>
+              <option>Intermediate</option>
+              <option>Expert</option>
+            </select>
 
-      <div class="m-4">
+            <p>Style</p>
+            <select v-model="selectedActivity.style">
+              <option
+                disabled
+                value=""
+              >
+                Please select one
+              </option>
+              <option>Casual</option>
+              <option>Serious</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div>
         <input
-          class="bg-gray-200 py-2 px-4 rounded hover:bg-gray-300"
+          class="button-primary"
           type="submit"
           value="Submit"
         >
@@ -95,7 +161,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import ActivityCard from '@/components/ActivityCard.vue';
+
+import { computed, defineComponent, ref } from 'vue';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import L, { LeafletEvent } from 'leaflet';
 
@@ -104,8 +172,10 @@ import { SearchResult } from '../../node_modules/leaflet-geosearch/src/providers
 import iconUrl from '../../node_modules/leaflet/dist/images/marker-icon.png';
 import shadowUrl from '../../node_modules/leaflet/dist/images/marker-shadow.png';
 import iconRetinaUrl from '../../node_modules/leaflet/dist/images/marker-icon-2x.png';
-import { PartialTrip } from '../../../shared';
+import { Activity, ActivityCategory, PartialTrip } from '../../../shared';
 import { DateToYMDString } from '../../../shared/Utils/Date';
+
+import store from '../store';
 
 interface ShowLocationEvent extends LeafletEvent {
   // Called location because that is data in
@@ -117,16 +187,24 @@ interface ShowLocationEvent extends LeafletEvent {
 
 export default defineComponent({
   name: 'NewTrip',
+  components: {
+    ActivityCard,
+  },
   setup() {
     // Custom marker to be used by search and drag. Created here as used in computed
     const marker = ref(L.marker([50.5, 30.5]));
     const startDate = ref(DateToYMDString(new Date()));
     const endDate = ref(DateToYMDString(new Date()));
 
+    // Fetch activity catergories
+    store.dispatch.ActivityModule.fetchActivityCategoriesAsync();
+
     return {
       marker,
       startDate,
       endDate,
+      activityCategories: computed(() => store.state.ActivityModule.activityCategories),
+
     };
   },
 
@@ -135,6 +213,10 @@ export default defineComponent({
       name: '',
       address: '',
       errors: [] as string[],
+      activites: [] as Activity[],
+      selectedActivity: null as Activity|null,
+      selectedActivityIndex: -1,
+      selectedActivityCatergory: -1,
     };
   },
   computed: {
@@ -177,6 +259,7 @@ export default defineComponent({
         lat: latlng.lat,
         lng: latlng.lng,
         text_loc: this.address,
+        activites: this.activites,
       });
       /* eslint-enable @typescript-eslint/camelcase */
 
@@ -239,6 +322,21 @@ export default defineComponent({
 
       // Updates address textbox
       this.address = result.label;
+    },
+    createActivity() {
+      const newActivity = new Activity();
+      this.activites.push(newActivity);
+      this.selectActivity(newActivity, this.activites.length - 1);
+    },
+    selectActivity(activity: Activity, index: number) {
+      this.selectedActivity = activity;
+      this.selectedActivityIndex = index;
+      this.selectedActivityCatergory = activity.activityCategory.type_id;
+    },
+    setActivityCatergory() {
+      if (this.selectedActivity) {
+        (this.selectedActivity as Activity).activityCategory = this.activityCategories.find((e) => e.type_id === this.selectedActivityCatergory) as ActivityCategory;
+      }
     },
   },
 });

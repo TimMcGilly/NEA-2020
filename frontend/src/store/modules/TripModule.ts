@@ -75,6 +75,7 @@ const TripModule = defineModule({
             Authorization: `Bearer ${await token}`, // send the access token through the 'Authorization' header
           },
         }));
+        if (!res.isSuccess) { throw res.failArray; }
 
         // eslint-disable-next-line prefer-destructuring
         const trips: Trip[] = res.data.trips;
