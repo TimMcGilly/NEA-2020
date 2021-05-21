@@ -16,16 +16,16 @@ export enum Style {
 }
 
 export class Activity {
-    public activityCategory: ActivityCategory;
+    public activityCatergory: ActivityCategory;
     public experience: Experience;
     public style: Style;
 
 
     constructor(params: Activity = {} as Activity) {
         // Allows for empty constructor to be passed in
-        let { activityCategory = new ActivityCategory(), experience = Experience.beginner, style = Style.casual } = params;
+        let { activityCatergory = new ActivityCategory(), experience = Experience.beginner, style = Style.casual } = params;
 
-        this.activityCategory = activityCategory;
+        this.activityCatergory = activityCatergory;
         this.experience = experience;
         this.style = style;
     }

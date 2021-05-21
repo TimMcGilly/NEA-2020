@@ -1,8 +1,12 @@
 import { FieldPacket, RowDataPacket } from 'mysql2';
-import { SimpleDBTransactionWrapper } from '../db';
-import { ActivityCategory } from '../../../shared';
+import { SimpleDBTransactionWrapper, SimpleWrapperConn } from '../db';
+import { Activity, ActivityCategory } from '../../../shared';
 
-export async function GetActivityCategories(): Promise<ActivityCategory[]> {
+/**
+ * Fetches from DB all activity catergories
+ * @returns Array of all activity catergories
+ */
+export async function GetActivityCategories(parentConn?: SimpleWrapperConn): Promise<ActivityCategory[]> {
   return SimpleDBTransactionWrapper<ActivityCategory[]>(async (conn) => {
     const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT id, name, faicon FROM activity;');
 
@@ -16,5 +20,26 @@ export async function GetActivityCategories(): Promise<ActivityCategory[]> {
     )));
 
     return activityCategories;
-  });
+  }, parentConn);
+}
+
+export async function GetTripActivities(trip_id: number, parentConn?: SimpleWrapperConn): Promise<Activity[]> {
+  return SimpleDBTransactionWrapper<Activity[]>(async (conn) => {
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT activity.*, activitytotrip.experience, activitytotrip.style FROM activitytotrip, activity WHERE activitytotrip.trip_id = 1 AND activitytotrip.activity_id = activity.id;');
+
+    const activites: Activity[] = [];
+    rows.forEach((row) => {
+      const activityCatergory = new ActivityCategory({
+        type_id: row.id,
+        name: row.name,
+        faicon: row.faicon,
+      });
+      activites.push(new Activity({
+        activityCatergory,
+        experience: row.experience,
+        style: row.style,
+      }));
+    });
+    return activites;
+  }, parentConn);
 }

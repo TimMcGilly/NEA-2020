@@ -32,15 +32,24 @@ export function getDb(): Pool {
   return pool;
 }
 
+export interface SimpleWrapperConn extends PoolConnection{
+  simpleWrapped: boolean;
+}
+
 /**
  * Wrapper around a simple db connect using transation and basic error handling.
  * @param fn Function to run and parse query
  * @returns Result from function if sucessful
  */
-export async function SimpleDBTransactionWrapper<Type>(fn: (conn: PoolConnection) => Promise<Type>): Promise<Type> {
+export async function SimpleDBTransactionWrapper<Type>(fn: (conn: SimpleWrapperConn) => Promise<Type>, parentConn?: SimpleWrapperConn): Promise<Type> {
+  if (parentConn?.simpleWrapped) {
+    return fn(parentConn);
+  }
   let conn = null;
+
   try {
-    conn = await getDb().getConnection();
+    conn = await getDb().getConnection() as SimpleWrapperConn;
+    conn.simpleWrapped = true;
 
     await conn.beginTransaction();
 
@@ -56,6 +65,9 @@ export async function SimpleDBTransactionWrapper<Type>(fn: (conn: PoolConnection
     console.log(e);
     throw e;
   } finally {
-    if (conn) { conn.release(); }
+    if (conn) {
+      conn.release();
+      conn.simpleWrapped = false;
+    }
   }
 }

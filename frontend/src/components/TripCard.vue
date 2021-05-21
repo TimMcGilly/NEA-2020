@@ -17,6 +17,14 @@
         {{ formattedEndDate }}
       </p>
     </div>
+    <div class="flex">
+      <i
+        v-for="(activity, index) in trip.activites"
+        :key="index"
+        :class="activity.activityCatergory.faicon"
+        class="m-1 text-2xl"
+      />
+    </div>
   </div>
 </template>
 

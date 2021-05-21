@@ -81,7 +81,7 @@
       </div>
       <div class="w-3/4">
         <label class="text-gray-700">Activites:</label>
-        <div class="flex flex-wrap border p-1 pb-5">
+        <div class="flex flex-wrap border px-1 pb-5">
           <div
             class="flex flex-col"
             :class="{ 'w-1/2': selectedActivity != null}"
@@ -95,6 +95,7 @@
             />
             <button
               class="button-primary text-sm h-10 mx-5 my-2"
+              type="button"
               @click="createActivity"
             >
               + New Activity
@@ -331,11 +332,11 @@ export default defineComponent({
     selectActivity(activity: Activity, index: number) {
       this.selectedActivity = activity;
       this.selectedActivityIndex = index;
-      this.selectedActivityCatergory = activity.activityCategory.type_id;
+      this.selectedActivityCatergory = activity.activityCatergory.type_id;
     },
     setActivityCatergory() {
       if (this.selectedActivity) {
-        (this.selectedActivity as Activity).activityCategory = this.activityCategories.find((e) => e.type_id === this.selectedActivityCatergory) as ActivityCategory;
+        (this.selectedActivity as Activity).activityCatergory = this.activityCategories.find((e) => e.type_id === this.selectedActivityCatergory) as ActivityCategory;
       }
     },
   },
