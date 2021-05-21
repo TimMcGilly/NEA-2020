@@ -81,14 +81,14 @@
       </div>
       <div class="w-3/4">
         <label class="text-gray-700">Activites:</label>
-        <div class="flex flex-wrap border p-1">
+        <div class="flex flex-wrap border p-1 pb-5">
           <div
             class="flex flex-col"
             :class="{ 'w-1/2': selectedActivity != null}"
           >
             <ActivityCard
               v-for="(activity, index) in activites"
-              :key="index"
+              :key="index.toString()+activity.activityCategory.type_id.toString()"
               :activity="activity"
               :class="{ 'bg-gray-300': selectedActivityIndex == index}"
               @click="selectActivity(activity, index)"
