@@ -18,7 +18,7 @@ const ActivityModule = defineModule({
     activityCategories: [],
   } as ActivityModuleState,
   mutations: {
-    setActivityCatergory(state, activityCategories: ActivityCategory[]) {
+    setActivityCategory(state, activityCategories: ActivityCategory[]) {
       state.activityCategories = activityCategories;
     },
   },
@@ -35,7 +35,7 @@ const ActivityModule = defineModule({
         }));
         if (!res.isSuccess) { throw res.failArray; }
 
-        commit.setActivityCatergory(res.data.activityCategories);
+        commit.setActivityCategory(res.data.activityCategories);
       } catch (error) {
         console.error(error);
       }

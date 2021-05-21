@@ -21,7 +21,7 @@
       <i
         v-for="(activity, index) in trip.activites"
         :key="index"
-        :class="activity.activityCatergory.faicon"
+        :class="activity.activityCategory.faicon"
         class="m-1 text-2xl"
       />
     </div>

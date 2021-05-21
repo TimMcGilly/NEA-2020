@@ -107,8 +107,8 @@
           >
             <p>Activity Type</p>
             <select
-              v-model="selectedActivityCatergory"
-              @change="setActivityCatergory"
+              v-model="selectedActivityCategory"
+              @change="setActivityCategory"
             >
               <option
                 disabled
@@ -217,7 +217,7 @@ export default defineComponent({
       activites: [] as Activity[],
       selectedActivity: null as Activity|null,
       selectedActivityIndex: -1,
-      selectedActivityCatergory: -1,
+      selectedActivityCategory: -1,
     };
   },
   computed: {
@@ -332,11 +332,11 @@ export default defineComponent({
     selectActivity(activity: Activity, index: number) {
       this.selectedActivity = activity;
       this.selectedActivityIndex = index;
-      this.selectedActivityCatergory = activity.activityCatergory.type_id;
+      this.selectedActivityCategory = activity.activityCategory.type_id;
     },
-    setActivityCatergory() {
+    setActivityCategory() {
       if (this.selectedActivity) {
-        (this.selectedActivity as Activity).activityCatergory = this.activityCategories.find((e) => e.type_id === this.selectedActivityCatergory) as ActivityCategory;
+        (this.selectedActivity as Activity).activityCategory = this.activityCategories.find((e) => e.type_id === this.selectedActivityCategory) as ActivityCategory;
       }
     },
   },

@@ -29,13 +29,13 @@ export async function GetTripActivities(trip_id: number, parentConn?: SimpleWrap
 
     const activites: Activity[] = [];
     rows.forEach((row) => {
-      const activityCatergory = new ActivityCategory({
+      const activityCategory = new ActivityCategory({
         type_id: row.id,
         name: row.name,
         faicon: row.faicon,
       });
       activites.push(new Activity({
-        activityCatergory,
+        activityCategory,
         experience: row.experience,
         style: row.style,
       }));

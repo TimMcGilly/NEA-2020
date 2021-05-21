@@ -36,7 +36,7 @@ export async function CreateTrip(user_id: number, partialTrip: PartialTrip, pare
     // Insert activity trip links
     activites.forEach(async (activity) => {
       await conn.execute('INSERT INTO activitytotrip(activity_id, trip_id, experience, style) VALUES (?, ?, ?, ?)',
-        [activity.activityCatergory.type_id, tripDBID, activity.experience, activity.style]);
+        [activity.activityCategory.type_id, tripDBID, activity.experience, activity.style]);
     });
 
     return newTrip;
