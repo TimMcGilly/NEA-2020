@@ -1,0 +1,22 @@
+@startuml
+
+database auth0_db
+participant auth0
+actor frontend
+participant backend
+database backend_db
+
+frontend -> auth0: Nagivate to sign up page
+auth0 -> auth0: Authenticate user
+note left: Sign up rule\nruns here
+auth0 -> auth0_db: Set metadata\nOnboarded to False
+auth0 -> frontend: Redirect to Onboarding form
+frontend -> backend: Post Onboarding data
+backend -> backend_db: Create User with onboard Details
+group Management API
+backend -> auth0: Update user onboarding status
+auth0 -> auth0_db: Set metadata\nOnbarding to True
+end
+
+
+@enduml
