@@ -4,6 +4,7 @@
 import { ResponseHandler } from '@/utils/response';
 import axios from 'axios';
 import { defineModule } from 'direct-vuex';
+import { reactive } from 'vue';
 import { Trip, PartialTrip } from '../../../../shared';
 
 import { moduleActionContext, moduleGetterContext } from '../index';
@@ -15,7 +16,7 @@ export interface TripModuleState {
 const TripModule = defineModule({
   namespaced: true as true,
   state: {
-    trips: new Map<string, Trip>(),
+    trips: reactive(new Map<string, Trip>()),
   } as TripModuleState,
   getters: {
     allTrips(...args): Trip[] {
@@ -25,11 +26,27 @@ const TripModule = defineModule({
 
       return Array.from(state.trips.values());
     },
+    findTrip(...args) {
+      const {
+        state,
+      } = TripModuleGetterContext(args);
+      // Returns a function for user to use
+      return (uuid: string): Trip => {
+        const trip = state.trips.get(uuid);
+        console.log('here');
+
+        if (!trip) { throw Error('Bad trip id'); }
+        return trip;
+      };
+    },
   },
   mutations: {
     addTrip(state, trip: Trip) {
       console.log(trip);
       state.trips.set(trip.uuid, trip);
+    },
+    clearTrips(state) {
+      state.trips = new Map<string, Trip>();
     },
   },
   actions: {
@@ -80,6 +97,26 @@ const TripModule = defineModule({
         // eslint-disable-next-line prefer-destructuring
         const trips: Trip[] = res.data.trips;
         trips.forEach((trip) => commit.addTrip(new Trip(trip)));
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async fetchTripWithIDAsync(context, uuid: string) {
+      const { commit, rootGetters } = TripModuleActionContext(context);
+
+      const { token } = rootGetters;
+      // Use Axios to make a call to the /api/trips
+      try {
+        const res = new ResponseHandler(await axios.get(`/api/trip/${uuid}`, {
+          headers: {
+            Authorization: `Bearer ${await token}`, // send the access token through the 'Authorization' header
+          },
+        }));
+        if (!res.isSuccess) { throw res.failArray; }
+
+        // eslint-disable-next-line prefer-destructuring
+        const trip: Trip = res.data.trip;
+        commit.addTrip(new Trip(trip));
       } catch (error) {
         console.error(error);
       }

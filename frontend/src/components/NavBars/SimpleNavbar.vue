@@ -68,8 +68,8 @@ export default defineComponent({
   },
   methods: {
     // Log the user in
-    login() {
-      store.dispatch.UserModule.login();
+    async login() {
+      await store.dispatch.UserModule.login({});
     },
     // Log the user out
     logout() {

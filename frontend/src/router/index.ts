@@ -43,7 +43,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/trips',
     name: 'trips',
-    component: () => import('../views/Trips.vue'),
+    component: () => import('../views/TripsDashboard.vue'),
     beforeEnter: authRouteGuard,
   },
   {
@@ -51,7 +51,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/NewTrip.vue'),
     beforeEnter: authRouteGuard,
   },
-
+  {
+    path: '/trips/:id',
+    component: () => import('../views/TripRoot.vue'),
+    beforeEnter: authRouteGuard,
+  },
 ];
 
 const router = createRouter({

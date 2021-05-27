@@ -2,11 +2,12 @@
 /* eslint-disable import/no-cycle */
 
 import { ResponseHandler } from '@/utils/response';
+import { RedirectLoginOptions } from '@auth0/auth0-spa-js';
 import axios from 'axios';
 import { defineModule } from 'direct-vuex';
 import { PrivateUserDetails } from '../../../../shared';
 
-import { moduleActionContext } from '../index';
+import { moduleActionContext, moduleGetterContext } from '../index';
 
 export interface UserModuleState {
   ownerDetails: PrivateUserDetails|null;
@@ -17,6 +18,15 @@ const UserModule = defineModule({
   state: {
     ownerDetails: null,
   } as UserModuleState,
+  getters: {
+
+    loggedIn(...args): boolean {
+      const {
+        rootState,
+      } = UserModuleGetterContext(args);
+      return rootState.authPlugin.isAuthenticated;
+    },
+  },
   mutations: {
     updateUser(state, user: PrivateUserDetails) {
       state.ownerDetails = user;
@@ -47,10 +57,10 @@ const UserModule = defineModule({
         return ['Internal error'];
       }
     },
-    login(context) {
+    login(context, options: RedirectLoginOptions) {
       const { rootState } = UserModuleActionContext(context);
 
-      rootState.authPlugin.loginWithRedirect();
+      rootState.authPlugin.loginWithRedirect(options);
       this.fetchUserAsync(context);
     },
     /**
@@ -58,11 +68,12 @@ const UserModule = defineModule({
      * @param windowOrigin Pass in window.location.origin
      */
     logout(context, windowOrigin: string) {
-      const { commit, rootState } = UserModuleActionContext(context);
+      const { commit, rootState, rootCommit } = UserModuleActionContext(context);
       rootState.authPlugin.logout({
         returnTo: windowOrigin,
       });
       commit.clearUser();
+      rootCommit.TripModule.clearTrips();
     },
   },
 });
@@ -70,3 +81,5 @@ const UserModule = defineModule({
 export default UserModule;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const UserModuleActionContext = (context: any) => moduleActionContext(context, UserModule);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const UserModuleGetterContext = (args: [any, any, any, any]) => moduleGetterContext(args, UserModule);
