@@ -1,4 +1,5 @@
 <template>
+  <BlankNavbar />
   <div class="max-w-xl mx-auto py-12 md:max-w-4xl">
     <h1 class="text-2xl font-semibold m-4">
       Account details
@@ -99,10 +100,12 @@
 <script lang="ts">
 import axios from 'axios';
 import { defineComponent } from 'vue';
+import BlankNavbar from '@/components/NavBars/BlankNavbar.vue';
 import { Date13YearAgo, DateToYMDString } from '../../../shared/Utils/Date';
 
 export default defineComponent({
   name: 'Onboard',
+  components: { BlankNavbar },
   data() {
     return {
       name: '',

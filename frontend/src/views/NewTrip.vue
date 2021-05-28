@@ -1,5 +1,6 @@
 <!-- New trip form view -->
 <template>
+  <BackNavbar />
   <div class="max-w-xl mx-auto py-12 px-4 md:max-w-4xl">
     <h1 class="text-2xl font-semibold">
       New Trip
@@ -163,6 +164,7 @@
 
 <script lang="ts">
 import ActivityCard from '@/components/ActivityCard.vue';
+import BackNavbar from '@/components/NavBars/BackNavbar.vue';
 
 import { computed, defineComponent, ref } from 'vue';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
@@ -190,6 +192,7 @@ export default defineComponent({
   name: 'NewTrip',
   components: {
     ActivityCard,
+    BackNavbar,
   },
   setup() {
     // Custom marker to be used by search and drag. Created here as used in computed

@@ -3,18 +3,13 @@
   <div v-if="!$auth.loading.value">
     <div class="flex px-40 bg-blue-600 text-white">
       <div
-        v-if="$auth.isAuthenticated.value"
-        class="hover:bg-blue-700 cursor-pointer p-5"
-        @click="$router.push('/trips/')"
+        class="inline-block back mr-10 cursor-pointer"
+        @click="$router.go(-1)"
       >
-        <i class="fas fa-plane fa-2x" />
-        <p class="mx-auto">
-          Trips
-        </p>
+        <span class="fas fa-chevron-left text-white fa-2x align-middle" />
       </div>
 
       <div class="flex-1" />
-
       <ProfileLogin />
     </div>
   </div>
@@ -25,12 +20,14 @@ import { defineComponent } from 'vue';
 import ProfileLogin from '@/components/NavBars/ProfileLogin.vue';
 
 export default defineComponent({
-  name: 'SimpleNavbar',
+  name: 'BackNavbar',
   components: {
     ProfileLogin,
   },
 });
 </script>
-
-  <style>
+<style>
+.back {
+  line-height: 100px;
+}
 </style>
