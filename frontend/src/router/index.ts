@@ -49,6 +49,11 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: authRouteGuard,
     children: [
       {
+        path: '',
+        redirect: (to) => `/trips/${to.params.id}/findindividuals`
+        ,
+      },
+      {
         path: 'findindividuals',
         component: () => import('../views/TripNestedViews/FindIndividuals.vue'),
         beforeEnter: authRouteGuard,
