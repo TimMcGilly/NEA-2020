@@ -11,7 +11,7 @@ import { promises as fs } from 'fs';
 import path, { extname } from 'path';
 
 import { GetUserController } from './controllers/userController';
-import { CreateTripController, FindAllTripsController } from './controllers/tripController';
+import { CreateTripController, FindAllTripsController, FindTripByIdController } from './controllers/tripController';
 import { GetActivitesCategoriesController } from './controllers/activityController';
 import { Date13YearAgo, DateToYMDString, AddDaysToDate } from '../../shared/Utils/Date';
 
@@ -131,6 +131,7 @@ app.post('/api/onboard',
 
 /// Trip Route ///
 app.get('/api/trip', ...FindAllTripsController);
+app.get('/api/trip/:id', ...FindTripByIdController);
 app.post('/api/trip', ...CreateTripController);
 
 /// User Route ///

@@ -66,3 +66,15 @@ export async function FindAllTrips(user_id : number, parentConn?: SimpleWrapperC
     return newTrips;
   }, parentConn);
 }
+export async function FindTripById(user_id:number, uuid: string, parentConn?: SimpleWrapperConn): Promise<Trip> {
+  return SimpleDBTransactionWrapper<Trip>(async (conn) => {
+    // Get trip rows
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT id AS trip_id, BIN_TO_UUID(uuid, true) AS uuid, name, start_date, end_date, lat, lng, text_loc, user_id FROM trip WHERE user_id = ? AND uuid = UUID_TO_BIN(?, true)', [user_id, uuid]);
+
+    // Fetch trip activites
+    const activites = await GetTripActivities(rows[0].trip_id, conn);
+
+    // Cast db row to Trip and add activites
+    return new Trip({ ...rows[0] as Trip, activites });
+  }, parentConn);
+}
