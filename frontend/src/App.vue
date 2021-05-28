@@ -1,13 +1,22 @@
 <template>
   <SimpleNavbar />
   <router-view v-slot="{ Component, route }">
-    <!-- Use any custom transition and fallback to `fade` -->
-    <transition
-      :name="route.meta.transition || 'fade'"
-      mode="out-in"
-    >
-      <component :is="Component" />
-    </transition>
+    <suspense>
+      <template #default>
+        <!-- Use any custom transition and fallback to `fade` -->
+        <transition
+          :name="route.meta.transition || 'fade'"
+          mode="out-in"
+        >
+          <div>
+            <component :is="Component" />
+          </div>
+        </transition>
+      </template>
+      <template #fallback>
+        Loading...
+      </template>
+    </suspense>
   </router-view>
 </template>
 

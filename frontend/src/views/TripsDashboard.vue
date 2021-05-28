@@ -1,3 +1,4 @@
+<!-- Dashboard of all trip -->
 <template>
   <div class="wide-page">
     <h1>Trips</h1>
@@ -12,6 +13,7 @@
         v-for="trip in trips"
         :key="trip.uuid"
         :trip="trip"
+        @click="$router.push('/trips/'+trip.uuid)"
       />
     </div>
   </div>
@@ -23,7 +25,7 @@ import TripCard from '@/components/TripCard.vue';
 import store from '../store';
 
 export default defineComponent({
-  name: 'Trips',
+  name: 'TripsDashboard',
   components: {
     TripCard,
   },

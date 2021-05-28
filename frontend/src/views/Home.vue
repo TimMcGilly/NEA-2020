@@ -18,8 +18,8 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'Home',
   methods: {
-    login() {
-      store.dispatch.UserModule.login();
+    async login() {
+      await store.dispatch.UserModule.login({});
     },
   },
 });

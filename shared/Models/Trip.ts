@@ -13,12 +13,13 @@ export class PartialTrip {
     constructor({ name, start_date, end_date, lat, lng, text_loc, activites }:
         { name: string; start_date: Date; end_date: Date; lat: number; lng: number; text_loc: string; activites: Activity[] }) {
         this.name = name;
-        this.start_date = start_date;
-        this.end_date = end_date;
+        this.start_date = new Date(start_date);
+        this.end_date = new Date(end_date);
         this.lat = lat;
         this.lng = lng;
         this.text_loc = text_loc;
-        this.activites = activites;
+        this.activites = [];
+        activites.forEach(a => this.activites.push(new Activity(a)));
     }
 }
 
