@@ -15,14 +15,6 @@ const routes: Array<RouteRecordRaw> = [
     component: Callback,
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import('../views/About.vue'),
-  },
-  {
     path: '/profile',
     name: 'Profile',
     component: () => import('../views/Profile.vue'),
@@ -55,6 +47,18 @@ const routes: Array<RouteRecordRaw> = [
     path: '/trips/:id',
     component: () => import('../views/TripRoot.vue'),
     beforeEnter: authRouteGuard,
+    children: [
+      {
+        path: 'findindividuals',
+        component: () => import('../views/TripNestedViews/FindIndividuals.vue'),
+        beforeEnter: authRouteGuard,
+      },
+      {
+        path: 'messaging',
+        component: () => import('../views/TripNestedViews/Messaging.vue'),
+        beforeEnter: authRouteGuard,
+      },
+    ],
   },
 ];
 

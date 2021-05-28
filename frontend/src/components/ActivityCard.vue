@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-xs rounded overflow-hidden shadow-lg m-2 px-3 py-2 flex">
+  <div class="max-w-xs rounded overflow-hidden shadow-lg m-2 px-3 py-2 flex w-64">
     <i
       class="m-3"
       :class="activity.activityCategory.faicon"

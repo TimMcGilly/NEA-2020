@@ -33,8 +33,6 @@ const TripModule = defineModule({
       // Returns a function for user to use
       return (uuid: string): Trip => {
         const trip = state.trips.get(uuid);
-        console.log('here');
-
         if (!trip) { throw Error('Bad trip id'); }
         return trip;
       };
