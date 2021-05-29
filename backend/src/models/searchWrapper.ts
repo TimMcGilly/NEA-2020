@@ -60,7 +60,7 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
 
     // Extract params to be passed to first query
 
-    const maxDistance = 50; // 50 km max distance
+    const maxDistance = 20; // 50 km max distance
     const R = 6371; // Earths radius
 
     // eslint-disable-next-line no-param-reassign

@@ -46,6 +46,9 @@ const TripModule = defineModule({
     clearTrips(state) {
       state.trips = new Map<string, Trip>();
     },
+    deleteTrip(state, uuid: string) {
+      state.trips.delete(uuid);
+    },
   },
   actions: {
     /**
@@ -115,6 +118,25 @@ const TripModule = defineModule({
         // eslint-disable-next-line prefer-destructuring
         const trip: Trip = res.data.trip;
         commit.addTrip(new Trip(trip));
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async deleteTrip(context, uuid: string) {
+      const { commit, rootGetters } = TripModuleActionContext(context);
+
+      const { token } = rootGetters;
+      // Use Axios to make a call to the /api/trips
+      try {
+        const res = new ResponseHandler(await axios.delete(`/api/trip/${uuid}`, {
+          headers: {
+            Authorization: `Bearer ${await token}`, // send the access token through the 'Authorization' header
+          },
+        }));
+
+        if (!res.isSuccess) { throw res.failArray; }
+
+        commit.deleteTrip(uuid);
       } catch (error) {
         console.error(error);
       }

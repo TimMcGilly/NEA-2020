@@ -1,7 +1,7 @@
 <template>
   <!-- Check that the SDK client is not currently loading before accessing is methods -->
   <div v-if="!$auth.loading.value">
-    <div class="flex px-40 bg-blue-600 text-white">
+    <div class="flex px-40 bg-blue-500 text-white">
       <div
         class="inline-block back mr-10 cursor-pointer"
         @click="$router.go(-1)"

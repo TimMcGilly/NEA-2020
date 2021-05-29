@@ -12,7 +12,9 @@ import path, { extname } from 'path';
 
 import { SearchIndividualController } from './controllers/searchController';
 import { GetUserController } from './controllers/userController';
-import { CreateTripController, FindAllTripsController, FindTripByIdController } from './controllers/tripController';
+import {
+  CreateTripController, FindAllTripsController, FindTripByIdController, DeleteTripByIdController,
+} from './controllers/tripController';
 import { GetActivitesCategoriesController } from './controllers/activityController';
 import { Date13YearAgo, DateToYMDString, AddDaysToDate } from '../../shared/Utils/Date';
 
@@ -132,8 +134,9 @@ app.post('/api/onboard',
 
 /// Trip Route ///
 app.get('/api/trip', ...FindAllTripsController);
-app.get('/api/trip/:id', ...FindTripByIdController);
+app.get('/api/trip/:uuid', ...FindTripByIdController);
 app.post('/api/trip', ...CreateTripController);
+app.delete('/api/trip/:uuid', ...DeleteTripByIdController);
 
 /// User Route ///
 app.get('/api/user', ...GetUserController);

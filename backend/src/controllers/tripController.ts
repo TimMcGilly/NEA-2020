@@ -26,13 +26,25 @@ export const FindAllTripsController = [
 ];
 
 export const FindTripByIdController = [
-  param('id').isString(),
+  param('uuid').isString(),
   CheckValidation,
   async function FindTripByIdController(req: Request, res: Response): Promise<Response> {
     const userId = await GetUserIDFromSub(req.user.sub);
 
-    const fetchedTrip = await trip.FindTripById(userId, req.params.id);
+    const fetchedTrip = await trip.FindTripById(userId, req.params.uuid);
 
     return res.status(200).json(SuccessFmt({ trip: fetchedTrip }));
+  },
+];
+
+export const DeleteTripByIdController = [
+  param('uuid').isString(),
+  CheckValidation,
+  async function DeleteTripByIdController(req: Request, res: Response): Promise<Response> {
+    const userId = await GetUserIDFromSub(req.user.sub);
+
+    await trip.DeleteTripById(userId, req.params.uuid);
+
+    return res.status(200).json(SuccessFmt(null));
   },
 ];
