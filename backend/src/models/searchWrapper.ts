@@ -1,5 +1,5 @@
 import { FieldPacket, RowDataPacket } from 'mysql2';
-import { DotProduct, HadamardProduct } from 'utils/linearalgebra';
+import { DotProduct, HadamardProduct } from '../utils/linearalgebra';
 import { SimpleDBTransactionWrapper, SimpleWrapperConn } from '../db';
 import { SearchResult } from '../../../shared/Models/SearchResult';
 import { GetTripActivities } from './activityWrapper';
@@ -44,7 +44,7 @@ async function FetchSearchResult(trip_id: number, conn: SimpleWrapperConn):Promi
   return new SearchResult({ ...rows[0] as SearchResult, activites });
 }
 
-export async function SearchTrips(user_id: number, trip_uuid: string, parentConn?: SimpleWrapperConn): Promise<SearchResult[]> {
+export async function SearchIndividualTrips(user_id: number, trip_uuid: string, parentConn?: SimpleWrapperConn): Promise<SearchResult[]> {
   return SimpleDBTransactionWrapper<SearchResult[]>(async (conn) => {
     // Fetch search trip from db
     // Get trip rows
@@ -53,15 +53,23 @@ export async function SearchTrips(user_id: number, trip_uuid: string, parentConn
     // Fetch trip activites
     const activites = await GetTripActivities(searchTripRows[0].trip_id, conn);
 
-    const searchTripId = searchTripRows[0].id;
+    const searchTripId = searchTripRows[0].trip_id;
     const searchTrip = new Trip({ ...searchTripRows[0] as Trip, activites });
-
+    console.log(searchTrip);
     if (!searchTrip) { throw new Error('Invalid trip inputed'); }
 
     // Extract params to be passed to first query
 
     const maxDistance = 50; // 50 km max distance
     const R = 6371; // Earths radius
+
+    // eslint-disable-next-line no-param-reassign
+    conn.config.multipleStatements = true;
+
+    // Query db for data matrix
+    await conn.query('SET @sql = ""');
+    await conn.execute("SELECT @sql := CONCAT(@sql,if(@sql='','',', '),temp.output), @sql FROM ( SELECT DISTINCT CONCAT('MAX(IF(activity.name = ''', name, ''', activitytotrip.experience, NULL)) AS ', activity.id,'_experience, ',   'MAX(IF(activity.name = ''', name, ''', activitytotrip.style, NULL)) AS ', activity.id, '_style' ) as output FROM activity, activitytotrip WHERE activitytotrip.trip_id = ? AND activitytotrip.activity_id = activity.id ORDER BY activity.id ) as temp", [searchTripId]);
+    const [activitiesRows]: [RowDataPacket[], FieldPacket[]] = await conn.query('SELECT @sql');
 
     // eslint-disable-next-line no-param-reassign
     conn.config.namedPlaceholders = true;
@@ -78,45 +86,12 @@ export async function SearchTrips(user_id: number, trip_uuid: string, parentConn
       end_date: searchTrip.end_date,
     };
 
-    // Query db for data matrix
-    const [filterRows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(`SET @sql = '';
-    SELECT
-        @sql := CONCAT(@sql,if(@sql='','',', '),temp.output)
-    FROM
-    (
-        SELECT
-          DISTINCT
-            CONCAT(
-             'MAX(IF(activity.name = ''',
-              name,
-              ''', activitytotrip.experience, NULL)) AS ',
-              activity.id,'_experience, ',  
-              'MAX(IF(activity.name = ''',
-              name,
-              ''', activitytotrip.style, NULL)) AS ',
-              activity.id, '_style'
-            ) as output
-        FROM
-            activity,
-            activitytotrip
-        WHERE
-            activitytotrip.trip_id = :trip_id
-            AND activitytotrip.activity_id = activity.id
-        ORDER BY
-            activity.id
-    ) as temp;
-    
-    SET @sql = CONCAT('SELECT trip.id, trip.lat, trip.lng, DATEOVERLAP(trip.start_date, trip.end_date, :start_date, :end_date) as overlap', @sql, ' 
-                       FROM trip
-                       JOIN activitytotrip
-                        ON trip.id = activitytotrip.trip_id
-                       JOIN activity 
-                        ON activitytotrip.activity_id = activity.id
-                       WHERE lat Between :lat_min And :lat_max
-                        And lng Between :lng_min And :lng_max
-                        AND trip.id <> :trip_id
-                       GROUP BY trip.id');
-    )`, queryValues);
+    const [filterRows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(`SELECT trip.id, trip.lat, trip.lng, DATEOVERLAP(trip.start_date, trip.end_date, :start_date, :end_date) as overlap, ${activitiesRows[0]['@sql']} FROM trip JOIN activitytotrip ON trip.id = activitytotrip.trip_id JOIN activity ON activitytotrip.activity_id = activity.id WHERE lat Between :lat_min And :lat_max  And lng Between :lng_min And :lng_max AND trip.id <> :trip_id GROUP BY trip.id;`, queryValues);
+
+    // eslint-disable-next-line no-param-reassign
+    conn.config.namedPlaceholders = false;
+    // eslint-disable-next-line no-param-reassign
+    conn.config.multipleStatements = false;
 
     const tripLength = DaysBetweenDates(searchTrip.start_date, searchTrip.end_date);
 
@@ -129,7 +104,7 @@ export async function SearchTrips(user_id: number, trip_uuid: string, parentConn
 
     // Results from dot product with result and trip_id
     const dotResults: Map<number, number> = new Map<number, number>();
-
+    console.log(filterRows);
     filterRows.forEach((r) => {
       // Calculated components
 
@@ -156,6 +131,8 @@ export async function SearchTrips(user_id: number, trip_uuid: string, parentConn
           activitesDetailsComponent += ExperienceSimilarity(a.experience, r[`${a.activityCategory.type_id}_experience`]);
         }
       });
+
+      console.log(dotResults);
 
       const rowVector = [distanceComponent, r.overlap, sharedActivites, activitesDetailsComponent];
 

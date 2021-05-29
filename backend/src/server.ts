@@ -10,6 +10,7 @@ import { FieldPacket, RowDataPacket } from 'mysql2';
 import { promises as fs } from 'fs';
 import path, { extname } from 'path';
 
+import { SearchIndividualController } from './controllers/searchController';
 import { GetUserController } from './controllers/userController';
 import { CreateTripController, FindAllTripsController, FindTripByIdController } from './controllers/tripController';
 import { GetActivitesCategoriesController } from './controllers/activityController';
@@ -139,6 +140,9 @@ app.get('/api/user', ...GetUserController);
 
 /// Activity Route ///
 app.get('/api/activites/categories', ...GetActivitesCategoriesController);
+
+/// Search Route ///
+app.get('/api/search/individuals', SearchIndividualController);
 
 // Start the app
 app.listen(3001, () => console.log('API listening on 3001'));
