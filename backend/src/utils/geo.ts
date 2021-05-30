@@ -12,5 +12,5 @@ export function SphericalCosine(lat1: number, lng1:number, lat2:number, lng2:num
 
   const lat1rad = lat1 * deg2rad;
   const lat2rad = lat2 * deg2rad;
-  return Math.acos(sin(lat1rad) * sin(lat2rad) + cos(lat1rad) * cos(lat2rad) * cos((lng2 - lng1) * deg2rad));
+  return Math.acos(sin(lat1rad) * sin(lat2rad) + cos(lat1rad) * cos(lat2rad) * cos((lng2 - lng1) * deg2rad)) * 6371; // 6,371 is radius of earth
 }

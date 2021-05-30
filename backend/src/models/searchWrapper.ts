@@ -1,11 +1,12 @@
 import { FieldPacket, RowDataPacket } from 'mysql2';
+import { Console } from 'console';
 import { DotProduct, HadamardProduct } from '../utils/linearalgebra';
 import { SimpleDBTransactionWrapper, SimpleWrapperConn } from '../db';
 import { SearchResult } from '../../../shared/Models/SearchResult';
 import { GetTripActivities } from './activityWrapper';
 import { Trip } from '../../../shared/Models/Trip';
 import { SphericalCosine } from '../utils/geo';
-import { Experience } from '../../../shared/Models/Activity';
+import { Experience, StrToExperience } from '../../../shared/Models/Activity';
 import { AssertUnreachable } from '../../../shared/Utils/TypescriptHelpers';
 import { DaysBetweenDates } from '../../../shared/Utils/Date';
 
@@ -29,7 +30,7 @@ function ExperienceSimilarity(e1: Experience, e2: Experience) {
   return 1 - Math.abs(e1Num - e2Num);
 }
 
-async function FetchSearchResult(trip_id: number, conn: SimpleWrapperConn):Promise<SearchResult> {
+async function FetchSearchResult(trip_id: number, conn: SimpleWrapperConn): Promise<SearchResult> {
   const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(`SELECT BIN_TO_UUID(trip.uuid, true) as trip_uuid, user.name, user.bio_description, user.avatar, trip.start_date, trip.end_date
                                 FROM
                                     trip
@@ -55,12 +56,11 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
 
     const searchTripId = searchTripRows[0].trip_id;
     const searchTrip = new Trip({ ...searchTripRows[0] as Trip, activites });
-    console.log(searchTrip);
     if (!searchTrip) { throw new Error('Invalid trip inputed'); }
 
     // Extract params to be passed to first query
 
-    const maxDistance = 20; // 50 km max distance
+    const maxDistance = 20000; // 50 km max distance
     const R = 6371; // Earths radius
 
     // eslint-disable-next-line no-param-reassign
@@ -86,7 +86,7 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
       end_date: searchTrip.end_date,
     };
 
-    const [filterRows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(`SELECT trip.id, trip.lat, trip.lng, DATEOVERLAP(trip.start_date, trip.end_date, :start_date, :end_date) as overlap, ${activitiesRows[0]['@sql']} FROM trip JOIN activitytotrip ON trip.id = activitytotrip.trip_id JOIN activity ON activitytotrip.activity_id = activity.id WHERE lat Between :lat_min And :lat_max  And lng Between :lng_min And :lng_max AND trip.id <> :trip_id GROUP BY trip.id;`, queryValues);
+    const [filterRows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(`SELECT trip.id, trip.lat, trip.lng, DATEOVERLAP(trip.start_date, trip.end_date, :start_date, :end_date) as overlap, ${activitiesRows[0]['@sql']} FROM trip LEFT JOIN activitytotrip ON trip.id = activitytotrip.trip_id LEFT JOIN activity ON activitytotrip.activity_id = activity.id WHERE lat Between :lat_min And :lat_max  And lng Between :lng_min And :lng_max AND trip.id <> :trip_id GROUP BY trip.id;`, queryValues);
 
     // eslint-disable-next-line no-param-reassign
     conn.config.namedPlaceholders = false;
@@ -104,7 +104,7 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
 
     // Results from dot product with result and trip_id
     const dotResults: Map<number, number> = new Map<number, number>();
-    console.log(filterRows);
+
     filterRows.forEach((r) => {
       // Calculated components
 
@@ -128,11 +128,9 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
         if (r[`${a.activityCategory.type_id}_style`]) {
           sharedActivites += 1;
           activitesDetailsComponent += a.style.toString() === r[`${a.activityCategory.type_id}_style`] ? 1 : 0;
-          activitesDetailsComponent += ExperienceSimilarity(a.experience, r[`${a.activityCategory.type_id}_experience`]);
+          activitesDetailsComponent += ExperienceSimilarity(StrToExperience(a.experience), StrToExperience(r[`${a.activityCategory.type_id}_experience`]));
         }
       });
-
-      console.log(dotResults);
 
       const rowVector = [distanceComponent, r.overlap, sharedActivites, activitesDetailsComponent];
 
@@ -142,10 +140,21 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
     // Sort trips by dotProduct
     const sortedTrips = new Map<number, number>([...dotResults.entries()].sort((a, b) => b[0] - a[0]));
 
-    const results: SearchResult[] = [];
+    const results = [];
+    console.log(sortedTrips);
 
-    sortedTrips.forEach(async (_, t) => { results.push(await FetchSearchResult(t, conn)); });
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [key, value] of sortedTrips.entries()) {
+      results.push(FetchSearchResult(value, conn));
+    }
 
-    return results;
+    // // sortedTrips.entries() (([k, v]) => );
+    // await Promise.all(Object.entries(sortedTrips).map(async ([_, v]) => {
+    //   console.log('here');
+
+    // }));
+
+    console.log(results);
+    return Promise.all(results);
   }, parentConn);
 }

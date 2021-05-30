@@ -34,7 +34,12 @@ const SearchModule = defineModule({
         }));
         if (!res.isSuccess) { throw res.failArray; }
 
-        return res.data.searchResults;
+        const searchResults: SearchResult[] = [];
+        res.data.searchResults.forEach((s: SearchResult) => searchResults.push(new SearchResult(s)));
+
+        console.log(searchResults);
+
+        return searchResults;
       } catch (error) {
         console.error(error);
         throw error;

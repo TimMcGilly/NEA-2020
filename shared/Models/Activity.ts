@@ -7,6 +7,10 @@ export enum Experience {
     expert
 }
 
+export function StrToExperience(exStr: string|Experience): Experience{
+    return Experience[exStr as keyof typeof Experience];
+}
+
 /**
  * style enum mirrors in DB
  */
@@ -26,7 +30,7 @@ export class Activity {
         let { activityCategory = new ActivityCategory(), experience = Experience.beginner, style = Style.casual } = params;
 
         this.activityCategory = activityCategory;
-        this.experience = experience;
+        this.experience = StrToExperience(experience);
         this.style = style;
     }
 }

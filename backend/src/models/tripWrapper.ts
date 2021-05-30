@@ -55,6 +55,8 @@ export async function FindAllTrips(user_id : number, parentConn?: SimpleWrapperC
 
     // Turn rows into array of trips
     let newTrips: Trip[] = [];
+
+    // TODO: Change for loop type
     rows.forEach(async (r) => {
       const activites = await GetTripActivities(r.trip_id, conn);
 
