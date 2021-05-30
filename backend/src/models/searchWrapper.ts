@@ -1,5 +1,4 @@
 import { FieldPacket, RowDataPacket } from 'mysql2';
-import { Console } from 'console';
 import { DotProduct, HadamardProduct } from '../utils/linearalgebra';
 import { SimpleDBTransactionWrapper, SimpleWrapperConn } from '../db';
 import { SearchResult } from '../../../shared/Models/SearchResult';
@@ -9,6 +8,8 @@ import { SphericalCosine } from '../utils/geo';
 import { Experience, StrToExperience } from '../../../shared/Models/Activity';
 import { AssertUnreachable } from '../../../shared/Utils/TypescriptHelpers';
 import { DaysBetweenDates } from '../../../shared/Utils/Date';
+import { WrapInfTo0 } from '../utils/general';
+import { rad2deg, deg2rad } from '../utils/constants';
 
 function ExperienceToNum(e: Experience): number {
   switch (e) {
@@ -60,7 +61,7 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
 
     // Extract params to be passed to first query
 
-    const maxDistance = 20000; // 50 km max distance
+    const maxDistance = 20; // 50 km max distance
     const R = 6371; // Earths radius
 
     // Query db for data matrix
@@ -75,13 +76,15 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
 
     const queryValues = {
       trip_id: searchTripId,
-      lat_min: searchTrip.lat - maxDistance / (R * (180 / Math.PI)),
-      lat_max: searchTrip.lat + maxDistance / (R * (180 / Math.PI)),
-      lng_min: searchTrip.lng - maxDistance / (R * (180 / Math.PI)) / Math.cos(searchTrip.lat * (Math.PI / 180)),
-      lng_max: searchTrip.lng + maxDistance / (R * (180 / Math.PI)) / Math.cos(searchTrip.lat * (Math.PI / 180)),
+      lat_min: searchTrip.lat - (maxDistance / R) * rad2deg,
+      lat_max: searchTrip.lat + (maxDistance / R) * rad2deg,
+      lng_min: searchTrip.lng - ((maxDistance / R) * rad2deg) / Math.cos(searchTrip.lat * deg2rad),
+      lng_max: searchTrip.lng + ((maxDistance / R) * rad2deg) / Math.cos(searchTrip.lat * deg2rad),
       start_date: searchTrip.start_date,
       end_date: searchTrip.end_date,
     };
+
+    console.log(queryValues);
 
     // Required if there are no activites so only adds comma if they exist
     let activityQueryAddition = '';
@@ -94,10 +97,11 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
     // eslint-disable-next-line no-param-reassign
     conn.config.namedPlaceholders = false;
 
-    const tripLength = DaysBetweenDates(searchTrip.start_date, searchTrip.end_date);
+    // Plus 1 as same day counts
+    const tripLength = DaysBetweenDates(searchTrip.start_date, searchTrip.end_date) + 1;
 
     // Normalisation vector to Normalise all vectors from rows between 1 and 0
-    const normVector = [1, 1 / tripLength, 1 / searchTrip.activites.length, 1 / (2 * searchTrip.activites.length)];
+    const normVector = [1, WrapInfTo0(1 / tripLength), WrapInfTo0(1 / searchTrip.activites.length), WrapInfTo0(1 / (2 * searchTrip.activites.length))];
 
     const weightVector = [1, 1, 1, 1];
 
@@ -106,11 +110,13 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
     // Results from dot product with result and trip_id
     const dotResults: Map<number, [number, number]> = new Map<number, [number, number]>();
 
+    console.log(filterRows);
+
     filterRows.forEach((r) => {
       // Calculated components
 
       const distance = (SphericalCosine(r.lat, r.lng, searchTrip.lat, searchTrip.lng));
-
+      console.log(distance);
       // Skips row if outside max distance
       if (distance > maxDistance) {
         return;
@@ -137,6 +143,8 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
 
       dotResults.set(DotProduct(rowVector, weightedTripVector), [r.id, distance]);
     });
+
+    console.log(dotResults);
 
     // Sort trips by dotProduct
     const sortedTrips = new Map<number, [number, number]>([...dotResults.entries()].sort((a, b) => b[0] - a[0]));
