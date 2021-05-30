@@ -8,9 +8,10 @@ export class SearchResult {
     public start_date: Date;
     public end_date: Date;
     public activites: Activity[];
+    public distance: number;
 
     constructor(
-        { trip_uuid, name, bio_description, avatar, start_date, end_date, activites }:
+        { trip_uuid, name, bio_description, avatar, start_date, end_date, activites, distance }:
             {
                 trip_uuid: number,
                 name: string,
@@ -18,7 +19,8 @@ export class SearchResult {
                 avatar: string,
                 start_date: Date,
                 end_date: Date,
-                activites: Activity[]
+                activites: Activity[],
+                distance: number
             }) {
 
         this.trip_uuid = trip_uuid;
@@ -29,5 +31,6 @@ export class SearchResult {
         this.end_date = new Date(end_date);
         this.activites = [];
         activites.forEach(a => this.activites.push(new Activity(a)));
+        this.distance = distance;
     }
 }

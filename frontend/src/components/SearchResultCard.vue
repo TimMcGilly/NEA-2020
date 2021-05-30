@@ -1,9 +1,19 @@
 <template>
-  <div class="max-w-xs rounded overflow-hidden shadow-lg m-2 px-3 py-2 flex">
+  <div class="rounded-md overflow-hidden shadow-lg m-2 px-3 py-2 flex items-center content-center space-x-4">
+    <img
+      class="w-16 h-16 rounded-full "
+      :src="'/api/avatars/' + searchResult.avatar"
+    >
+    <h1>{{ searchResult.name }}</h1>
     <i
-      class="m-3"
-      :class="searchResult.name"
+      v-for="(activity, index) in searchResult.activites"
+      :key="index"
+      :class="activity.activityCategory.faicon"
+      class="m-1 text-2xl"
     />
+    <h2 class="text-2xl">
+      {{ searchResult.distance }} km
+    </h2>
   </div>
 </template>
 

@@ -30,7 +30,7 @@ function ExperienceSimilarity(e1: Experience, e2: Experience) {
   return 1 - Math.abs(e1Num - e2Num);
 }
 
-async function FetchSearchResult(trip_id: number, conn: SimpleWrapperConn): Promise<SearchResult> {
+async function FetchSearchResult(trip_id: number, distance: number, conn: SimpleWrapperConn): Promise<SearchResult> {
   const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(`SELECT BIN_TO_UUID(trip.uuid, true) as trip_uuid, user.name, user.bio_description, user.avatar, trip.start_date, trip.end_date
                                 FROM
                                     trip
@@ -42,7 +42,7 @@ async function FetchSearchResult(trip_id: number, conn: SimpleWrapperConn): Prom
   const activites = await GetTripActivities(trip_id, conn);
 
   // Cast db row to Trip and add activites
-  return new SearchResult({ ...rows[0] as SearchResult, activites });
+  return new SearchResult({ ...rows[0] as SearchResult, activites, distance: Math.round(distance) });
 }
 
 export async function SearchIndividualTrips(user_id: number, trip_uuid: string, parentConn?: SimpleWrapperConn): Promise<SearchResult[]> {
@@ -62,9 +62,6 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
 
     const maxDistance = 20000; // 50 km max distance
     const R = 6371; // Earths radius
-
-    // eslint-disable-next-line no-param-reassign
-    conn.config.multipleStatements = true;
 
     // Query db for data matrix
     await conn.query('SET @sql = ""');
@@ -86,12 +83,16 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
       end_date: searchTrip.end_date,
     };
 
-    const [filterRows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(`SELECT trip.id, trip.lat, trip.lng, DATEOVERLAP(trip.start_date, trip.end_date, :start_date, :end_date) as overlap, ${activitiesRows[0]['@sql']} FROM trip LEFT JOIN activitytotrip ON trip.id = activitytotrip.trip_id LEFT JOIN activity ON activitytotrip.activity_id = activity.id WHERE lat Between :lat_min And :lat_max  And lng Between :lng_min And :lng_max AND trip.id <> :trip_id GROUP BY trip.id;`, queryValues);
+    // Required if there are no activites so only adds comma if they exist
+    let activityQueryAddition = '';
+    if (activitiesRows[0]['@sql']) {
+      activityQueryAddition = `, ${activitiesRows[0]['@sql']}`;
+    }
+
+    const [filterRows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(`SELECT trip.id, trip.lat, trip.lng, DATEOVERLAP(trip.start_date, trip.end_date, :start_date, :end_date) as overlap${activityQueryAddition} FROM trip LEFT JOIN activitytotrip ON trip.id = activitytotrip.trip_id LEFT JOIN activity ON activitytotrip.activity_id = activity.id WHERE lat Between :lat_min And :lat_max  And lng Between :lng_min And :lng_max AND trip.id <> :trip_id GROUP BY trip.id;`, queryValues);
 
     // eslint-disable-next-line no-param-reassign
     conn.config.namedPlaceholders = false;
-    // eslint-disable-next-line no-param-reassign
-    conn.config.multipleStatements = false;
 
     const tripLength = DaysBetweenDates(searchTrip.start_date, searchTrip.end_date);
 
@@ -103,7 +104,7 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
     const weightedTripVector = HadamardProduct(normVector, weightVector);
 
     // Results from dot product with result and trip_id
-    const dotResults: Map<number, number> = new Map<number, number>();
+    const dotResults: Map<number, [number, number]> = new Map<number, [number, number]>();
 
     filterRows.forEach((r) => {
       // Calculated components
@@ -134,27 +135,19 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
 
       const rowVector = [distanceComponent, r.overlap, sharedActivites, activitesDetailsComponent];
 
-      dotResults.set(DotProduct(rowVector, weightedTripVector), r.id);
+      dotResults.set(DotProduct(rowVector, weightedTripVector), [r.id, distance]);
     });
 
     // Sort trips by dotProduct
-    const sortedTrips = new Map<number, number>([...dotResults.entries()].sort((a, b) => b[0] - a[0]));
+    const sortedTrips = new Map<number, [number, number]>([...dotResults.entries()].sort((a, b) => b[0] - a[0]));
 
     const results = [];
-    console.log(sortedTrips);
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, value] of sortedTrips.entries()) {
-      results.push(FetchSearchResult(value, conn));
+      results.push(FetchSearchResult(value[0], value[1], conn));
     }
 
-    // // sortedTrips.entries() (([k, v]) => );
-    // await Promise.all(Object.entries(sortedTrips).map(async ([_, v]) => {
-    //   console.log('here');
-
-    // }));
-
-    console.log(results);
     return Promise.all(results);
   }, parentConn);
 }
