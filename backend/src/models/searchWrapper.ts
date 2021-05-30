@@ -128,8 +128,8 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
         // Checks if activity exists on trip row
         if (r[`${a.activityCategory.type_id}_style`]) {
           sharedActivites += 1;
-          activitesDetailsComponent += a.style.toString() === r[`${a.activityCategory.type_id}_style`] ? 1 : 0;
-          activitesDetailsComponent += ExperienceSimilarity(StrToExperience(a.experience), StrToExperience(r[`${a.activityCategory.type_id}_experience`]));
+          activitesDetailsComponent += a.StyleStr === r[`${a.activityCategory.type_id}_style`] ? 1 : 0;
+          activitesDetailsComponent += ExperienceSimilarity(a.experience, StrToExperience(r[`${a.activityCategory.type_id}_experience`]));
         }
       });
 

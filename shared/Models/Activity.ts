@@ -19,6 +19,10 @@ export enum Style {
     serious
 }
 
+export function StrToStyle(styleStr: string|Style): Style{
+    return Style[styleStr as keyof typeof Style];
+}
+
 export class Activity {
     public activityCategory: ActivityCategory;
     public experience: Experience;
@@ -31,7 +35,16 @@ export class Activity {
 
         this.activityCategory = activityCategory;
         this.experience = StrToExperience(experience);
-        this.style = style;
+        this.style = StrToStyle(style);
+    }
+
+    
+    public get ExperienceStr() : string {
+        return Experience[this.experience];
+    }
+    
+    public get StyleStr() : string {
+        return Style[this.style];
     }
 }
 

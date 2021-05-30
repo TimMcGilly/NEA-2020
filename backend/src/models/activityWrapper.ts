@@ -38,7 +38,7 @@ export async function GetTripActivities(trip_id: number, parentConn?: SimpleWrap
         activityCategory,
         experience: row.experience,
         style: row.style,
-      }));
+      } as Activity));
     });
     return activites;
   }, parentConn);
