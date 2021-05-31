@@ -9,8 +9,13 @@ import { Experience, StrToExperience } from '../../../shared/Models/Activity';
 import { AssertUnreachable } from '../../../shared/Utils/TypescriptHelpers';
 import { DaysBetweenDates } from '../../../shared/Utils/Date';
 import { WrapInfTo0 } from '../utils/general';
-import { rad2deg, deg2rad } from '../utils/constants';
+import { rad2deg, deg2rad, EarthRadius as R } from '../utils/constants';
 
+/**
+ * Maps Experience enum to numerical constant
+ * @param e Experience num value
+ * @returns numerical constant related to enum
+ */
 function ExperienceToNum(e: Experience): number {
   switch (e) {
     case Experience.beginner:
@@ -24,6 +29,12 @@ function ExperienceToNum(e: Experience): number {
   }
 }
 
+/**
+ * Calculate a numerical similarity between two Experience enums
+ * @param e1 Experience 1
+ * @param e2 Experience 2
+ * @returns Numerical similarity between 0 and 1
+ */
 function ExperienceSimilarity(e1: Experience, e2: Experience) {
   const e1Num = ExperienceToNum(e1);
   const e2Num = ExperienceToNum(e2);
@@ -31,6 +42,13 @@ function ExperienceSimilarity(e1: Experience, e2: Experience) {
   return 1 - Math.abs(e1Num - e2Num);
 }
 
+/**
+ * Fetch search result from db for trip id
+ * @param trip_id Trip id to fetch search result for
+ * @param distance Distance between search result and original search trip
+ * @param conn db connection
+ * @returns search result for specified trip
+ */
 async function FetchSearchResult(trip_id: number, distance: number, conn: SimpleWrapperConn): Promise<SearchResult> {
   const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(`SELECT BIN_TO_UUID(trip.uuid, true) as trip_uuid, user.name, user.bio_description, user.avatar, trip.start_date, trip.end_date
                                 FROM
@@ -49,7 +67,6 @@ async function FetchSearchResult(trip_id: number, distance: number, conn: Simple
 export async function SearchIndividualTrips(user_id: number, trip_uuid: string, parentConn?: SimpleWrapperConn): Promise<SearchResult[]> {
   return SimpleDBTransactionWrapper<SearchResult[]>(async (conn) => {
     // Fetch search trip from db
-    // Get trip rows
     const [searchTripRows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT id AS trip_id, BIN_TO_UUID(uuid, true) AS uuid, name, start_date, end_date, lat, lng, text_loc, user_id FROM trip WHERE user_id = ? AND uuid = UUID_TO_BIN(?, true)', [user_id, trip_uuid]);
 
     // Fetch trip activites
@@ -59,12 +76,9 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
     const searchTrip = new Trip({ ...searchTripRows[0] as Trip, activites });
     if (!searchTrip) { throw new Error('Invalid trip inputed'); }
 
-    // Extract params to be passed to first query
-
     const maxDistance = 20; // 50 km max distance
-    const R = 6371; // Earths radius
 
-    // Query db for data matrix
+    // Query db for activity column headings
     await conn.query('SET @sql = ""');
     await conn.execute("SELECT @sql := CONCAT(@sql,if(@sql='','',', '),temp.output), @sql FROM ( SELECT DISTINCT CONCAT('MAX(IF(activity.name = ''', name, ''', activitytotrip.experience, NULL)) AS ', activity.id,'_experience, ',   'MAX(IF(activity.name = ''', name, ''', activitytotrip.style, NULL)) AS ', activity.id, '_style' ) as output FROM activity, activitytotrip WHERE activitytotrip.trip_id = ? AND activitytotrip.activity_id = activity.id ORDER BY activity.id ) as temp", [searchTripId]);
     const [activitiesRows]: [RowDataPacket[], FieldPacket[]] = await conn.query('SELECT @sql');
@@ -72,8 +86,8 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
     // eslint-disable-next-line no-param-reassign
     conn.config.namedPlaceholders = true;
 
+    // All query values to pass to inital query
     // Lat lng min max based off https://www.movable-type.co.uk/scripts/latlong-db.html
-
     const queryValues = {
       trip_id: searchTripId,
       lat_min: searchTrip.lat - (maxDistance / R) * rad2deg,
@@ -84,14 +98,13 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
       end_date: searchTrip.end_date,
     };
 
-    console.log(queryValues);
-
     // Required if there are no activites so only adds comma if they exist
     let activityQueryAddition = '';
     if (activitiesRows[0]['@sql']) {
       activityQueryAddition = `, ${activitiesRows[0]['@sql']}`;
     }
 
+    // Query for data to create data matrix or calculated values
     const [filterRows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(`SELECT trip.id, trip.lat, trip.lng, DATEOVERLAP(trip.start_date, trip.end_date, :start_date, :end_date) as overlap${activityQueryAddition} FROM trip LEFT JOIN activitytotrip ON trip.id = activitytotrip.trip_id LEFT JOIN activity ON activitytotrip.activity_id = activity.id WHERE lat Between :lat_min And :lat_max  And lng Between :lng_min And :lng_max AND trip.id <> :trip_id AND DATEOVERLAP(trip.start_date, trip.end_date, :start_date, :end_date) > 0 GROUP BY trip.id;`, queryValues);
 
     // eslint-disable-next-line no-param-reassign
@@ -110,13 +123,11 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
     // Results from dot product with result and trip_id
     const dotResults: Map<number, [number, number]> = new Map<number, [number, number]>();
 
-    console.log(filterRows);
-
     filterRows.forEach((r) => {
       // Calculated components
 
       const distance = (SphericalCosine(r.lat, r.lng, searchTrip.lat, searchTrip.lng));
-      console.log(distance);
+
       // Skips row if outside max distance
       if (distance > maxDistance) {
         return;
@@ -130,6 +141,7 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
       // Component based on details similarity in shared activites
       let activitesDetailsComponent = 0;
 
+      // Calculates actitivite components
       searchTrip.activites.forEach((a) => {
         // Checks if activity exists on trip row
         if (r[`${a.activityCategory.type_id}_style`]) {
@@ -144,12 +156,12 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
       dotResults.set(DotProduct(rowVector, weightedTripVector), [r.id, distance]);
     });
 
-    console.log(dotResults);
-
     // Sort trips by dotProduct
     const sortedTrips = new Map<number, [number, number]>([...dotResults.entries()].sort((a, b) => b[0] - a[0]));
 
     const results = [];
+
+    // Fetches search results from sorted dictionary
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, value] of sortedTrips.entries()) {
