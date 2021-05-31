@@ -125,28 +125,28 @@
               </option>
             </select>
             <p>Experience</p>
-            <select v-model="selectedActivity.experience">
+            <select v-model="selectedActivity.ExperienceStr">
               <option
                 disabled
                 value=""
               >
                 Please select one
               </option>
-              <option>Beginner</option>
-              <option>Intermediate</option>
-              <option>Expert</option>
+              <option>beginner</option>
+              <option>intermediate</option>
+              <option>expert</option>
             </select>
 
             <p>Style</p>
-            <select v-model="selectedActivity.style">
+            <select v-model="selectedActivity.StyleStr">
               <option
                 disabled
                 value=""
               >
                 Please select one
               </option>
-              <option>Casual</option>
-              <option>Serious</option>
+              <option>casual</option>
+              <option>serious</option>
             </select>
           </div>
         </div>

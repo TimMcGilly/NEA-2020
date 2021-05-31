@@ -8,7 +8,7 @@ export enum Experience {
 }
 
 export function StrToExperience(exStr: string|Experience): Experience{
-    return Experience[exStr as keyof typeof Experience];
+    return Experience[exStr.toString().toLowerCase() as keyof typeof Experience];
 }
 
 /**
@@ -20,7 +20,7 @@ export enum Style {
 }
 
 export function StrToStyle(styleStr: string|Style): Style{
-    return Style[styleStr as keyof typeof Style];
+    return Style[styleStr.toString().toLowerCase() as keyof typeof Style];
 }
 
 export class Activity {
@@ -39,12 +39,23 @@ export class Activity {
     }
 
     
+    
     public get ExperienceStr() : string {
         return Experience[this.experience];
+    }
+
+    public set ExperienceStr(ex: string){
+        this.experience = StrToExperience(ex);
+        console.log(StrToExperience(ex));
+        console.log(ex);
     }
     
     public get StyleStr() : string {
         return Style[this.style];
+    }
+
+    public set StyleStr(stylestr: string) {
+        this.style = StrToStyle(stylestr);
     }
 }
 
