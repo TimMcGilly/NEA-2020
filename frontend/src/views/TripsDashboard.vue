@@ -15,7 +15,6 @@
         v-for="trip in trips"
         :key="trip.uuid"
         :trip="trip"
-        @click="$router.push('/trips/'+trip.uuid)"
       />
     </div>
   </div>

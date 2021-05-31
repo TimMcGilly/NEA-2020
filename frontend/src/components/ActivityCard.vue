@@ -9,10 +9,10 @@
         {{ activity.activityCategory.name }}
       </p>
       <p>
-        Experience - {{ activity.experience }}
+        Experience - {{ activity.ExperienceStr }}
       </p>
       <p>
-        Style - {{ activity.style }}
+        Style - {{ activity.StyleStr }}
       </p>
     </div>
   </div>

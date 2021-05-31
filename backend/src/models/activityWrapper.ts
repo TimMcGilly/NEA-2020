@@ -25,7 +25,7 @@ export async function GetActivityCategories(parentConn?: SimpleWrapperConn): Pro
 
 export async function GetTripActivities(trip_id: number, parentConn?: SimpleWrapperConn): Promise<Activity[]> {
   return SimpleDBTransactionWrapper<Activity[]>(async (conn) => {
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT activity.*, activitytotrip.experience, activitytotrip.style FROM activitytotrip, activity WHERE activitytotrip.trip_id = 1 AND activitytotrip.activity_id = activity.id;');
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT activity.*, activitytotrip.experience, activitytotrip.style FROM activitytotrip, activity WHERE activitytotrip.trip_id = ? AND activitytotrip.activity_id = activity.id;', [trip_id]);
 
     const activites: Activity[] = [];
     rows.forEach((row) => {
@@ -38,7 +38,7 @@ export async function GetTripActivities(trip_id: number, parentConn?: SimpleWrap
         activityCategory,
         experience: row.experience,
         style: row.style,
-      }));
+      } as Activity));
     });
     return activites;
   }, parentConn);

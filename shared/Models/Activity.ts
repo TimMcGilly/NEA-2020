@@ -7,12 +7,20 @@ export enum Experience {
     expert
 }
 
+export function StrToExperience(exStr: string|Experience): Experience{
+    return Experience[exStr.toString().toLowerCase() as keyof typeof Experience];
+}
+
 /**
  * style enum mirrors in DB
  */
 export enum Style {
     casual,
     serious
+}
+
+export function StrToStyle(styleStr: string|Style): Style{
+    return Style[styleStr.toString().toLowerCase() as keyof typeof Style];
 }
 
 export class Activity {
@@ -26,8 +34,28 @@ export class Activity {
         let { activityCategory = new ActivityCategory(), experience = Experience.beginner, style = Style.casual } = params;
 
         this.activityCategory = activityCategory;
-        this.experience = experience;
-        this.style = style;
+        this.experience = StrToExperience(experience);
+        this.style = StrToStyle(style);
+    }
+
+    
+    
+    public get ExperienceStr() : string {
+        return Experience[this.experience];
+    }
+
+    public set ExperienceStr(ex: string){
+        this.experience = StrToExperience(ex);
+        console.log(StrToExperience(ex));
+        console.log(ex);
+    }
+    
+    public get StyleStr() : string {
+        return Style[this.style];
+    }
+
+    public set StyleStr(stylestr: string) {
+        this.style = StrToStyle(stylestr);
     }
 }
 

@@ -3,6 +3,7 @@ import { createDirectStore } from 'direct-vuex';
 import TripModule from './modules/TripModule';
 import UserModule from './modules/UserModule';
 import ActivityModule from './modules/ActivityModule';
+import SearchModule from './modules/SearchModule';
 
 export interface RootState {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,6 +36,7 @@ const {
     TripModule,
     UserModule,
     ActivityModule,
+    SearchModule,
   },
 });
 

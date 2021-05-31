@@ -3,7 +3,7 @@
   <div
     v-if="!$auth.loading.value"
   >
-    <div class="flex px-40 bg-blue-600 text-white">
+    <div class="flex px-40 bg-blue-500 text-white py-5">
       <div class="flex-1" />
       <ProfileLogin />
     </div>

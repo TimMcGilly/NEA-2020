@@ -1,0 +1,12 @@
+FUNCTION DATEOVERLAP( start1, end1, start2, end2)
+latest_start = max(start1, start2)
+earliest_end = min(end1, end2)
+overlap = earliest_end – latest_start
+
+IF overlap < 0 DO
+    overlap = 0
+END IF
+
+return overlap
+
+END FUNCTION

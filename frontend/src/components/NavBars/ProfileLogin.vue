@@ -17,7 +17,7 @@
   <!-- show logout when authenticated -->
   <button
     v-if="!$auth.isAuthenticated.value"
-    class="button-primary text-black my-5"
+    class="button-primary text-black my-auto"
     @click="login"
   >
     Sign Up / Log in
@@ -25,7 +25,7 @@
 
   <button
     v-if="$auth.isAuthenticated.value"
-    class="button-primary text-black my-5 my-auto"
+    class="button-primary text-black my-auto"
     @click="logout"
   >
     Log out

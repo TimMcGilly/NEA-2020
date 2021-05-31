@@ -21,3 +21,8 @@ export function DateToYMDString(date : Date): string {
   date = new Date(date.getTime() - (offset*60*1000))
   return date.toISOString().split('T')[0] 
 }
+
+// https://stackoverflow.com/questions/542938/how-do-i-get-the-number-of-days-between-two-dates-in-javascript
+export function DaysBetweenDates(firstDate: Date, secondDate: Date): number {
+  return Math.round((+secondDate- +firstDate)/(1000*60*60*24));
+}

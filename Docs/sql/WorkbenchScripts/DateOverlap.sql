@@ -1,0 +1,18 @@
+DELIMITER $$
+CREATE FUNCTION DATEOVERLAP(start1 DATE, end1 DATE, start2 DATE, end2 DATE) 
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    RETURN GREATEST(LEAST(end1, end2)+1 - GREATEST(start1, start2), 0);
+END$$
+
+DELIMITER ;
+
+SET @s = 'SELECT DATEOVERLAP(trip.start_date, trip.end_date, ?, ?) FROM trip;';
+
+
+PREPARE stmt FROM @s;
+SET @a = DATE("2021-06-30");
+SET @b = DATE("2021-06-6");
+EXECUTE stmt USING @a, @b;
+DEALLOCATE PREPARE stmt;

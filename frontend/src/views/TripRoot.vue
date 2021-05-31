@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="bg-blue-500 px-20 text-white">
-      <div class="flex content-center ">
+      <div class="flex content-center py-5 ">
         <div
           class="inline-block back mr-10 cursor-pointer"
           @click="$router.push('/trips/')"
@@ -32,7 +32,7 @@
         >
           <i class="fas fa-user text-2xl" />
           <span
-            class="block font-semibold my-auto"
+            class="block font-semibold my-auto pb-1"
           >
             Find Individuals
           </span>
@@ -49,7 +49,7 @@
         >
           <i class="fas fa-envelope text-2xl" />
           <span
-            class="block font-semibold my-auto"
+            class="block font-semibold my-auto pb-1"
           >
             Messaging
           </span>

@@ -1,4 +1,4 @@
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 import { Request, Response } from 'express';
 import { CheckValidation, SuccessFmt } from '../utils/response';
 import { GetUserIDFromSub } from '../utils/user';
@@ -22,5 +22,29 @@ export const FindAllTripsController = [
     const trips = await trip.FindAllTrips(userId);
 
     return res.status(200).json(SuccessFmt({ trips }));
+  },
+];
+
+export const FindTripByIdController = [
+  param('uuid').isString(),
+  CheckValidation,
+  async function FindTripByIdController(req: Request, res: Response): Promise<Response> {
+    const userId = await GetUserIDFromSub(req.user.sub);
+
+    const fetchedTrip = await trip.FindTripById(userId, req.params.uuid);
+
+    return res.status(200).json(SuccessFmt({ trip: fetchedTrip }));
+  },
+];
+
+export const DeleteTripByIdController = [
+  param('uuid').isString(),
+  CheckValidation,
+  async function DeleteTripByIdController(req: Request, res: Response): Promise<Response> {
+    const userId = await GetUserIDFromSub(req.user.sub);
+
+    await trip.DeleteTripById(userId, req.params.uuid);
+
+    return res.status(200).json(SuccessFmt(null));
   },
 ];
