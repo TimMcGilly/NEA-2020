@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md overflow-hidden shadow-lg m-2 px-3 py-2 flex items-center content-center space-x-4">
+  <div class="rounded-md overflow-hidden shadow-lg m-2 px-3 py-4 flex items-center content-center space-x-4">
     <img
       class="w-16 h-16 rounded-full "
       :src="'/api/avatars/' + searchResult.avatar"

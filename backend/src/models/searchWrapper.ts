@@ -92,7 +92,7 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
       activityQueryAddition = `, ${activitiesRows[0]['@sql']}`;
     }
 
-    const [filterRows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(`SELECT trip.id, trip.lat, trip.lng, DATEOVERLAP(trip.start_date, trip.end_date, :start_date, :end_date) as overlap${activityQueryAddition} FROM trip LEFT JOIN activitytotrip ON trip.id = activitytotrip.trip_id LEFT JOIN activity ON activitytotrip.activity_id = activity.id WHERE lat Between :lat_min And :lat_max  And lng Between :lng_min And :lng_max AND trip.id <> :trip_id GROUP BY trip.id;`, queryValues);
+    const [filterRows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(`SELECT trip.id, trip.lat, trip.lng, DATEOVERLAP(trip.start_date, trip.end_date, :start_date, :end_date) as overlap${activityQueryAddition} FROM trip LEFT JOIN activitytotrip ON trip.id = activitytotrip.trip_id LEFT JOIN activity ON activitytotrip.activity_id = activity.id WHERE lat Between :lat_min And :lat_max  And lng Between :lng_min And :lng_max AND trip.id <> :trip_id AND DATEOVERLAP(trip.start_date, trip.end_date, :start_date, :end_date) > 0 GROUP BY trip.id;`, queryValues);
 
     // eslint-disable-next-line no-param-reassign
     conn.config.namedPlaceholders = false;
@@ -103,7 +103,7 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
     // Normalisation vector to Normalise all vectors from rows between 1 and 0
     const normVector = [1, WrapInfTo0(1 / tripLength), WrapInfTo0(1 / searchTrip.activites.length), WrapInfTo0(1 / (2 * searchTrip.activites.length))];
 
-    const weightVector = [1, 1, 1, 1];
+    const weightVector = [1, 1, 0.25, 1];
 
     const weightedTripVector = HadamardProduct(normVector, weightVector);
 
@@ -135,7 +135,7 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
         if (r[`${a.activityCategory.type_id}_style`]) {
           sharedActivites += 1;
           activitesDetailsComponent += a.StyleStr === r[`${a.activityCategory.type_id}_style`] ? 1 : 0;
-          activitesDetailsComponent += ExperienceSimilarity(a.experience, StrToExperience(r[`${a.activityCategory.type_id}_experience`]));
+          activitesDetailsComponent += ExperienceSimilarity(StrToExperience(a.experience), StrToExperience(r[`${a.activityCategory.type_id}_experience`]));
         }
       });
 
