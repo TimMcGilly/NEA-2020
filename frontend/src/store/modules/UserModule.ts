@@ -75,6 +75,23 @@ const UserModule = defineModule({
       commit.clearUser();
       rootCommit.TripModule.clearTrips();
     },
+    async onboardUser(context, form: FormData) {
+      const { rootGetters } = UserModuleActionContext(context);
+
+      const { token } = rootGetters;
+
+      // Use Axios to make a call to the onboard API
+      try {
+        await axios.post('/api/onboard', form, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${await token}`, // send the access token through the 'Authorization' header
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    },
   },
 });
 

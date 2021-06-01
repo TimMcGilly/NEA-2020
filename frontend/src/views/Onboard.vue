@@ -102,6 +102,7 @@ import axios from 'axios';
 import { defineComponent } from 'vue';
 import BlankNavbar from '@/components/NavBars/BlankNavbar.vue';
 import { Date13YearAgo, DateToYMDString } from '../../../shared/Utils/Date';
+import store from '../store';
 
 export default defineComponent({
   name: 'Onboard',
@@ -143,21 +144,9 @@ export default defineComponent({
       form.append('bio', this.bio);
       form.append('avatar', this.avatar as File);
 
-      // Get the access token from the auth wrapper
-      const token = await this.$auth.getTokenSilently();
+      await store.dispatch.UserModule.onboardUser(form);
 
-      // Use Axios to make a call to the onboard API
-      try {
-        await axios.post('/api/onboard', form, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`, // send the access token through the 'Authorization' header
-          },
-        });
-        this.$router.push('trips');
-      } catch (error) {
-        console.error(error);
-      }
+      this.$router.push('trips');
     },
   },
 });

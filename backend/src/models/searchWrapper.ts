@@ -66,6 +66,8 @@ async function FetchSearchResult(trip_id: number, distance: number, conn: Simple
 
 export async function SearchIndividualTrips(user_id: number, trip_uuid: string, parentConn?: SimpleWrapperConn): Promise<SearchResult[]> {
   return SimpleDBTransactionWrapper<SearchResult[]>(async (conn) => {
+    const maxDistance = 20; // 50 km max distance
+
     // Fetch search trip from db
     const [searchTripRows]: [RowDataPacket[], FieldPacket[]] = await conn.execute('SELECT id AS trip_id, BIN_TO_UUID(uuid, true) AS uuid, name, start_date, end_date, lat, lng, text_loc, user_id FROM trip WHERE user_id = ? AND uuid = UUID_TO_BIN(?, true)', [user_id, trip_uuid]);
 
@@ -76,9 +78,9 @@ export async function SearchIndividualTrips(user_id: number, trip_uuid: string, 
     const searchTrip = new Trip({ ...searchTripRows[0] as Trip, activites });
     if (!searchTrip) { throw new Error('Invalid trip inputed'); }
 
-    const maxDistance = 20; // 50 km max distance
-
     // Query db for activity column headings
+    // Based off https://stackoverflow.com/questions/12598120/mysql-pivot-table-query-with-dynamic-columns
+
     await conn.query('SET @sql = ""');
     await conn.execute("SELECT @sql := CONCAT(@sql,if(@sql='','',', '),temp.output), @sql FROM ( SELECT DISTINCT CONCAT('MAX(IF(activity.name = ''', name, ''', activitytotrip.experience, NULL)) AS ', activity.id,'_experience, ',   'MAX(IF(activity.name = ''', name, ''', activitytotrip.style, NULL)) AS ', activity.id, '_style' ) as output FROM activity, activitytotrip WHERE activitytotrip.trip_id = ? AND activitytotrip.activity_id = activity.id ORDER BY activity.id ) as temp", [searchTripId]);
     const [activitiesRows]: [RowDataPacket[], FieldPacket[]] = await conn.query('SELECT @sql');
